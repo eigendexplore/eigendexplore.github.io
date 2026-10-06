@@ -75,13 +75,20 @@ export const loadLights = () => (lightsP ??= fetch(`${BASE}lights.json`).then(r 
 let rectInit = false;
 export function initAreaLights() { if (!rectInit) { RectAreaLightUniformsLib.init(); rectInit = true; } }
 
+// Imagination PowerVR GPUs (the Pixel 10's) hang on a VSM map read inside the area-light loop (LIGHTS_CHUNK), and Chrome
+// then blocks WebGL for the whole page; PCF soft shadows there work (a little crisper, everything else the same)
+function vsmHangs(r) {
+  const gl = r.getContext(), info = gl.getExtension('WEBGL_debug_renderer_info');
+  return /PowerVR|Imagination/i.test(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+}
+
 export function makeRenderer(canvas, { mobile }) {
   const r = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
   r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
   r.outputColorSpace = THREE.SRGBColorSpace;
   r.toneMapping = THREE.CustomToneMapping;
   r.shadowMap.enabled = true;
-  r.shadowMap.type = THREE.VSMShadowMap;
+  r.shadowMap.type = vsmHangs(r) ? THREE.PCFSoftShadowMap : THREE.VSMShadowMap;
   r.shadowMap.autoUpdate = false;                                 // re-rendered only when a pose changes
   r.setClearColor(0x000000, 0);
   r.setScissorTest(true);
