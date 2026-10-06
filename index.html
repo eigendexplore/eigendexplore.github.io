@@ -1,25 +1,460 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="robots" content="noindex">
-<title>EigenDEXplore</title>
-<style>
-  :root { --bg: #fafaf9; --fg: #1c1917; --muted: #78716c; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #1c1917; --fg: #fafaf9; --muted: #a8a29e; } }
-  html, body { height: 100%; margin: 0; }
-  body { display: grid; place-items: center; background: var(--bg); color: var(--fg);
-         font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif; padding: 0 16px; }
-  main { text-align: center; }
-  h1 { font-size: clamp(2rem, 6vw, 3.25rem); font-weight: 600; letter-spacing: -0.02em; margin: 0 0 .5rem; }
-  p { color: var(--muted); font-size: 1.1rem; margin: 0; }
-</style>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors</title>
+<meta name="description" content="EigenDEXplore guides dexterous hand exploration by adding perturbations along human-derived eigenvectors to joint-space noise, with the action space unchanged.">
+<link rel="canonical" href="https://eigendexplore.github.io/">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta name="author" content="Harsh Gupta, Tyler Ga Wei Lum, Changhao Wang, Chuer Pan, Karen Liu, Jeannette Bohg, Shuran Song">
+<!-- link previews (Open Graph: iMessage, Slack, LinkedIn, Facebook, Discord) and X / Twitter -->
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="EigenDEXplore">
+<meta property="og:title" content="EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors">
+<meta property="og:description" content="EigenDEXplore guides dexterous hand exploration by adding perturbations along human-derived eigenvectors to joint-space noise, with the action space unchanged.">
+<meta property="og:url" content="https://eigendexplore.github.io/">
+<meta property="og:image" content="https://eigendexplore.github.io/assets/brand/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:type" content="image/jpeg">
+<meta property="og:image:alt" content="EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors, with pixel-art robot hands around the title">
+<meta property="og:locale" content="en_US">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors">
+<meta name="twitter:description" content="EigenDEXplore guides dexterous hand exploration by adding perturbations along human-derived eigenvectors to joint-space noise, with the action space unchanged.">
+<meta name="twitter:image" content="https://eigendexplore.github.io/assets/brand/og-image.jpg">
+<meta name="twitter:image:alt" content="EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors, with pixel-art robot hands around the title">
+<!-- Google Scholar (Highwire). Names as in the paper and the BibTeX. Add citation_publication_date once the paper is posted. -->
+<meta name="citation_title" content="EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors">
+<meta name="citation_author" content="Gupta, Harsh">
+<meta name="citation_author" content="Lum, Tyler Ga Wei">
+<meta name="citation_author" content="Wang, Changhao">
+<meta name="citation_author" content="Pan, Chuer">
+<meta name="citation_author" content="Liu, C. Karen">
+<meta name="citation_author" content="Bohg, Jeannette">
+<meta name="citation_author" content="Song, Shuran">
+<meta name="citation_pdf_url" content="https://eigendexplore.github.io/assets/paper/EigenDEXplore.pdf">
+<meta name="theme-color" content="#ffffff">
+<link rel="icon" href="assets/brand/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="assets/brand/favicon-32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="assets/brand/favicon-16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="assets/brand/apple-touch-icon.png">
+<link rel="manifest" href="site.webmanifest">
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="css/site.css">
+<link rel="stylesheet" href="css/s5hands.css">
+<link rel="stylesheet" href="css/s5plot.css">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.min.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<!-- after the import map, and the exact src of the module script at the end of <body> (bump both ?v= together) -->
+<link rel="modulepreload" href="js/main.js?v=20261006c">
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "ScholarlyArticle",
+  "headline": "EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors",
+  "name": "EigenDEXplore: Structured Exploration for Dexterous Manipulation with Human Priors",
+  "abstract": "Dexterous manipulation poses a challenging high-dimensional optimization problem, as useful behaviors require coordinated motion across many hand joints. In reinforcement learning (RL) and sampling-based trajectory optimization, exploration commonly relies on independent robot joint perturbations, making coordinated behaviors difficult to discover. Prior work reduces this search space for grasp learning using low-dimensional spaces of coordinated joint motions learned from human hand data, but this restricts the expressivity required for general manipulation. Some combine learned and joint-space actions to restore expressivity, but this increases dimensionality and introduces redundancy. We study these effects across diverse manipulation settings, varying action dimensionality, exploration strategy, and the source of human data. Our experiments suggest that human-motion priors are most effective when used to structure exploration rather than change the action representation. Motivated by this finding, we propose EigenDEXplore, which induces correlated exploration by adding perturbations along human-derived eigenvectors to independent joint-space noise, leaving the action space unchanged. Across multiple dexterous hands, EigenDEXplore consistently outperforms joint-space and learned action-space baselines in grasping, in-hand reorientation, and contact-rich manipulation. These gains span unstructured and reference-guided RL, trajectory optimization, and sim-to-real deployment, and are largest in settings with less reward shaping and curriculum design.",
+  "author": [
+    {"@type": "Person", "name": "Harsh Gupta", "url": "https://hgupt3.github.io/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Tyler Ga Wei Lum", "url": "https://tylerlum.github.io/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Changhao Wang", "url": "https://changhaowang.github.io/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Chuer Pan", "url": "https://chuerpan.com/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Karen Liu", "url": "https://cs.stanford.edu/people/karenliu/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Jeannette Bohg", "url": "https://web.stanford.edu/~bohg/", "affiliation": {"@type": "Organization", "name": "Stanford University"}},
+    {"@type": "Person", "name": "Shuran Song", "url": "https://shurans.github.io/", "affiliation": {"@type": "Organization", "name": "Stanford University"}}
+  ],
+  "image": "https://eigendexplore.github.io/assets/brand/og-image.jpg",
+  "url": "https://eigendexplore.github.io/"
+}
+</script>
 </head>
 <body>
-<main>
-  <h1>EigenDEXplore</h1>
-  <p>Under construction. Check back soon.</p>
-</main>
+<svg id="lg-defs" width="0" height="0" aria-hidden="true" style="position:absolute"></svg>
+
+<div class="opening" id="opening">
+  <header class="hero">
+    <!-- the end card's sprites (the video's credits, renders/part5_sprites/deliver_v2), in the same six spots -->
+    <div class="spr-row top" aria-hidden="true">
+      <i class="spr" data-spr="s1_human_prior" data-at="tl"></i>
+      <i class="spr" data-spr="s2_explore" data-at="tr"></i>
+      <i class="spr" data-spr="s5_spider" data-at="ml"></i>
+    </div>
+    <div class="hero-c">
+      <h1 class="title">EigenDEXplore</h1>
+      <p class="subtitle">Structured Exploration for Dexterous Manipulation with Human Priors</p>
+      <!-- row 1: the four first authors (two groups, which stack only on the narrowest screens), row 2: the three professors -->
+      <div class="authors">
+        <p class="arow"><span class="agrp"><span class="au"><a href="https://hgupt3.github.io/" target="_blank" rel="noopener">Harsh Gupta</a><sup class="eqc" title="Equal contribution">*</sup></span><span class="au"><a href="https://tylerlum.github.io/" target="_blank" rel="noopener">Tyler Ga Wei Lum</a><sup class="eqc" title="Equal contribution">*</sup></span></span><span class="agrp"><span class="au"><a href="https://changhaowang.github.io/" target="_blank" rel="noopener">Changhao Wang</a></span><span class="au"><a href="https://chuerpan.com/" target="_blank" rel="noopener">Chuer Pan</a></span></span></p>
+        <p class="arow"><span class="agrp"><span class="au"><a href="https://cs.stanford.edu/people/karenliu/" target="_blank" rel="noopener">Karen Liu</a></span><span class="au"><a href="https://web.stanford.edu/~bohg/" target="_blank" rel="noopener">Jeannette Bohg</a></span><span class="au"><a href="https://shurans.github.io/" target="_blank" rel="noopener">Shuran Song</a></span></span></p>
+      </div>
+      <div class="affil-row">
+        <a class="affil" href="https://www.stanford.edu/" target="_blank" rel="noopener"><img src="assets/brand/stanford.svg" alt="Stanford University" width="80" height="20"></a>
+        <span class="eqnote"><sup>*</sup>Equal contribution</span>
+      </div>
+      <nav class="links" aria-label="Paper links">
+        <a class="glass btn lg" href="assets/paper/EigenDEXplore.pdf" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic doc"><path d="M6.5 2.75h7.25l4.75 4.75v12.25a1.5 1.5 0 0 1-1.5 1.5h-10.5a1.5 1.5 0 0 1-1.5-1.5V4.25a1.5 1.5 0 0 1 1.5-1.5Z"/><path d="M13.5 3v4.75h4.75M8.5 12.5h7M8.5 16h7"/></svg>Paper</a>
+        <a class="glass btn lg" href="#arxiv"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic brand arxiv"><path d="M3.8423 0a1.0037 1.0037 0 0 0-.922.6078c-.1536.3687-.0438.6275.2938 1.1113l6.9185 8.3597-1.0223 1.1058a1.0393 1.0393 0 0 0 .003 1.4229l1.2292 1.3135-5.4391 6.4444c-.2803.299-.4538.823-.2971 1.1986a1.0253 1.0253 0 0 0 .9585.635.9133.9133 0 0 0 .6891-.3405l5.783-6.126 7.4902 8.0051a.8527.8527 0 0 0 .6835.2597.9575.9575 0 0 0 .8777-.6138c.1577-.377-.017-.7502-.306-1.1407l-7.0518-8.3418 1.0632-1.13a.9626.9626 0 0 0 .0089-1.3165L4.6336.4639s-.3733-.4535-.768-.463zm0 .272h.0166c.2179.0052.4874.2715.5644.3639l.005.006.0052.0055 10.169 10.9905a.6915.6915 0 0 1-.0072.945l-1.0666 1.133-1.4982-1.7724-8.5994-10.39c-.3286-.472-.352-.6183-.2592-.841a.7307.7307 0 0 1 .6704-.4401Zm14.341 1.5701a.877.877 0 0 0-.6554.2418l-5.6962 6.1584 1.6944 1.8319 5.3089-6.5138c.3251-.4335.479-.6603.3247-1.0292a1.1205 1.1205 0 0 0-.9763-.689zm-7.6557 12.2823 1.3186 1.4135-5.7864 6.1295a.6494.6494 0 0 1-.4959.26.7516.7516 0 0 1-.706-.4669c-.1119-.2682.0359-.6864.2442-.9083l.0051-.0055.0047-.0055z"/></svg>arXiv</a>
+        <a class="glass btn lg" href="https://youtu.be/xqLCixerYVs" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic brand yt"><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>Video</a>
+        <a class="glass btn lg" href="https://github.com/hgupt3/eigendexplore" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic brand gh"><path d="M10.226 17.284c-2.965-.36-5.054-2.493-5.054-5.256 0-1.123.404-2.336 1.078-3.144-.292-.741-.247-2.314.09-2.965.898-.112 2.111.36 2.83 1.01.853-.269 1.752-.404 2.853-.404 1.1 0 1.999.135 2.807.382.696-.629 1.932-1.1 2.83-.988.315.606.36 2.179.067 2.942.72.854 1.101 2 1.101 3.167 0 2.763-2.089 4.852-5.098 5.234.763.494 1.28 1.572 1.28 2.807v2.336c0 .674.561 1.056 1.235.786 4.066-1.55 7.255-5.615 7.255-10.646C23.5 6.188 18.334 1 11.978 1 5.62 1 .5 6.188.5 12.545c0 4.986 3.167 9.12 7.435 10.669.606.225 1.19-.18 1.19-.786V20.63a2.9 2.9 0 0 1-1.078.224c-1.483 0-2.359-.808-2.987-2.313-.247-.607-.517-.966-1.034-1.033-.27-.023-.359-.135-.359-.27 0-.27.45-.471.898-.471.652 0 1.213.404 1.797 1.235.45.651.921.943 1.483.943.561 0 .92-.202 1.437-.719.382-.381.674-.718.944-.943"/></svg>Code</a>
+        <button type="button" class="glass btn lg" id="bibBtn" aria-expanded="false" aria-controls="bibCard"><svg viewBox="0 0 24 24" aria-hidden="true" class="ic doc"><path d="M7 4.5h10v15.25l-5-3.5-5 3.5Z"/></svg>BibTeX</button>
+      </nav>
+      <p class="tldr glass panel"><b>TL;DR</b> Robot hands usually explore by perturbing each joint independently, which produces unnatural motions and makes the coordinated, human-like behaviors that manipulation needs hard to discover. EigenDEXplore explores along the main directions of human hand motion, found with PCA on human hand videos retargeted to the robot, so it learns coordinated behaviors while the policy keeps full control of every joint.</p>
+    </div>
+    <div class="spr-row bot" aria-hidden="true">
+      <i class="spr" data-spr="s3_dextreme" data-at="bl"></i>
+      <i class="spr" data-spr="s6_any_hand" data-at="mr"></i>
+      <i class="spr" data-spr="s4_dexmachina" data-at="br"></i>
+    </div>
+  </header>
+
+  <!-- ============================================================ SECTION 1 -->
+  <section class="s1" id="real" aria-labelledby="s1-title">
+    <div class="s1-in" id="s1in">
+      <div class="sec-head">
+        <h2 id="s1-title">Tool use on a real robot</h2>
+        <p class="lead">A Sharpa hand on a KUKA iiwa14 arm moves four tools along trajectories recorded from human videos, reaching one tool-pose waypoint after another. Both policies were trained with RL in simulation with <strong>SimToolReal</strong> and run zero-shot on the real robot. A trial ends at the last waypoint, or when the tool is dropped or gets stuck.</p>
+      </div>
+
+      <div class="stage-top">
+        <div class="seg glass lg" id="taskSeg" role="tablist" aria-label="Task">
+          <button role="tab" data-task="hammer" aria-selected="true">Hammer</button>
+          <button role="tab" data-task="wipe" aria-selected="false">Wipe</button>
+          <button role="tab" data-task="brush" aria-selected="false">Brush</button>
+          <button role="tab" data-task="scoop" aria-selected="false">Scoop</button>
+          <span class="seg-thumb" aria-hidden="true"></span>
+        </div>
+        <p class="task-line" id="taskLine">Hammer the nails</p>
+        <div class="seg small" id="viewSeg" aria-label="View">
+          <button data-view="footage" aria-pressed="true">Footage</button>
+          <button data-view="3d" aria-pressed="false">3D replay</button>
+          <button data-view="trials" aria-pressed="false">More trials</button>
+        </div>
+      </div>
+
+      <div class="cards" id="cards">
+        <figure class="card" data-side="js">
+          <div class="media">
+            <video class="fv" muted playsinline preload="none" disablepictureinpicture></video>
+            <video class="tv" muted playsinline preload="none" disablepictureinpicture></video>
+          </div>
+          <div class="ov">
+            <span class="pill js lg">Standard Exploration</span>
+            <span class="chip lg" data-chip><span class="sp">1x</span><span class="dot">·</span><span class="tm">00:00</span></span>
+            <span class="auto lg">autonomous</span>
+            <span class="wp lg" data-wp><span class="wp-t">Waypoints <b>0</b> / <span class="wp-n">37</span></span><i class="wp-bar"><i></i></i></span>
+          </div>
+        </figure>
+        <figure class="card" data-side="ours">
+          <div class="media">
+            <video class="fv" muted playsinline preload="none" disablepictureinpicture></video>
+            <video class="tv" muted playsinline preload="none" disablepictureinpicture></video>
+          </div>
+          <div class="ov">
+            <span class="pill ours lg">EigenDEXplore</span>
+            <span class="chip lg" data-chip><span class="sp">1x</span><span class="dot">·</span><span class="tm">00:00</span></span>
+            <span class="auto lg">autonomous</span>
+            <span class="wp lg" data-wp><span class="wp-t">Waypoints <b>0</b> / <span class="wp-n">37</span></span><i class="wp-bar"><i></i></i></span>
+          </div>
+        </figure>
+        <canvas class="replay" id="replay" aria-label="3D replay of the two runs. Drag to orbit, double-click to return to the camera view."></canvas>
+        <div class="r3d-ui" id="r3dUi" hidden>
+          <button class="r3d-reset glass btn lg" id="r3dReset" title="Back to the camera that filmed the run">Reset view</button>
+        </div>
+      </div>
+
+      <div class="transport glass lg" id="transport">
+        <button class="round" id="playBtn" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-replay"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+        <div class="scrub" id="scrub" role="slider" tabindex="0" aria-label="Task time" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+          <div class="rail"><div class="track"><div class="fill"></div></div><div class="marks"></div><div class="knob lg" data-lg-blur="1"></div></div>
+        </div>
+        <span class="clock" id="clock">0:00</span>
+        <div class="seg small" id="timingSeg" aria-label="Timing">
+          <button data-timing="video" aria-pressed="true" title="The overview video's timing: long stretches play sped up so both runs reach their key moments together">Synced</button>
+          <button data-timing="real" aria-pressed="false" title="Both runs at 1x on one clock, from the start of the task">Real time</button>
+        </div>
+        <div class="seg small" id="trialSeg" aria-label="Trial" hidden>
+          <button data-k="lq" aria-pressed="false" title="Lower quartile of the 10 trials"><span class="l">Lower quartile</span><span class="s">Lower</span></button>
+          <button data-k="median" aria-pressed="true" title="Median of the 10 trials">Median</button>
+          <button data-k="uq" aria-pressed="false" title="Upper quartile of the 10 trials"><span class="l">Upper quartile</span><span class="s">Upper</span></button>
+          <button data-k="best" aria-pressed="false" title="Best of the 10 trials">Best</button>
+        </div>
+      </div>
+
+      <div class="score glass panel" id="score" aria-live="polite">
+        <div class="sc" data-side="js">
+          <div class="sc-head"><span class="lbl">Standard Exploration</span><span class="num js-c">42%</span></div>
+          <div class="trk"><i class="mean js-bg"></i><span class="dots"></span></div>
+        </div>
+        <div class="sc" data-side="ours">
+          <div class="sc-head"><span class="lbl">EigenDEXplore</span><span class="num ours-c">71%</span></div>
+          <div class="trk"><i class="mean ours-bg"></i><span class="dots"></span></div>
+        </div>
+        <p class="fine score-note" id="scoreNote">Ten trials per method, sorted. Task progress is the fraction of demonstrated waypoints the robot reaches.</p>
+      </div>
+      <details class="why" id="why">
+        <summary>What differs</summary>
+        <div class="why-body"><p>Standard Exploration tends to pinch the tool between the middle finger pad and the backs of the index and ring fingers, which slips and makes in-hand reorientation hard. EigenDEXplore learns a fingertip grasp with the thumb, index and middle finger pads, which holds the tool steadily and lets the hand turn it toward each next waypoint.</p></div>
+      </details>
+    </div>
+  </section>
+  <div class="bleed" aria-hidden="true"></div>
+</div>
+
+<!-- ============================================================ SECTION 2 -->
+<section class="s2" id="idea" aria-labelledby="s2-title">
+  <div class="s2-in" id="s2in">
+    <div class="sec-head">
+      <h2 id="s2-title">Explore the way human hands move</h2>
+      <p class="lead">Reinforcement learning finds behaviors by trying random variations of its actions, and how those variations are shaped decides which behaviors are easy to find. Everything below runs live on the Sharpa hand with the paper's PCA basis.</p>
+    </div>
+    <div class="s2-top">
+      <nav class="beats glass lg" id="beats" aria-label="Steps">
+        <span class="seg-thumb" aria-hidden="true"></span>
+        <button data-beat="0" aria-current="true"><span class="n">1</span><span class="t">Joint&#8209;Space</span><i></i></button>
+        <button data-beat="1"><span class="n">2</span><span class="t">Human hands</span><i></i></button>
+        <button data-beat="2"><span class="n">3</span><span class="t">Posture cloud</span><i></i></button>
+        <button data-beat="3"><span class="n">4</span><span class="t">Directions</span><i></i></button>
+        <button data-beat="4"><span class="n">5</span><span class="t">Exploring</span><i></i></button>
+        <button data-beat="5"><span class="n">6</span><span class="t">Compare</span><i></i></button>
+      </nav>
+      <div class="tour glass lg" id="tour"><button id="tourBtn" aria-label="Pause the tour"><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><span>Tour</span></button></div>
+    </div>
+    <div class="m-stage" id="mstage">
+      <div class="m-bg" data-side="js"></div>
+      <div class="m-bg" data-side="ours"></div>
+      <canvas id="mcanvas" aria-label="Live 3D: the Sharpa hand and the posture cloud. Drag to turn them."></canvas>
+      <div class="m-ov" data-side="js">
+        <span class="pill js lg">Joint&#8209;Space</span>
+        <p class="m-cap lg" aria-live="polite"></p>
+      </div>
+      <div class="m-ov" data-side="ours">
+        <span class="pill ours lg">EigenDEXplore</span>
+        <svg class="m-lines" id="mLines" aria-hidden="true"></svg>
+        <div class="m-posts" id="mPosts"></div>
+        <button class="m-pcl lg" type="button" style="--c:#7098b7">PC1</button>
+        <button class="m-pcl lg" type="button" style="--c:#e1b84e">PC2</button>
+        <button class="m-pcl lg" type="button" style="--c:#87a08b">PC3</button>
+        <span class="m-handtag lg" id="mHandTag" aria-hidden="true"></span>
+        <div class="m-ego" id="mEgo">
+          <div class="m-ego-media"><video muted playsinline preload="none"></video><canvas></canvas></div>
+          <span class="m-ego-t lg"></span>
+          <button class="m-ego-replay glass lg" id="mEgoReplay" type="button" aria-label="Play the clip again"><svg viewBox="0 0 24 24"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+        </div>
+        <p class="m-cap lg" aria-live="polite"></p>
+      </div>
+      <button class="m-reset glass btn lg" id="mReset" type="button">Reset view</button>
+      <div class="loading" id="s2loading"><span class="spinner"></span>Loading the hand</div>
+    </div>
+    <div class="m-under">
+      <p class="m-capn" id="mCapN" aria-live="polite"></p>
+      <p class="m-sub" id="mSub"></p>
+      <label class="m-scale glass lg" id="mScale"><span>Noise scale</span><input type="range" min="0" max="150" value="100" aria-label="Noise scale"><output>1.00×</output></label>
+      <div class="m-dirs" id="mDirs" role="group" aria-label="Move the hand along the human directions">
+        <label class="m-dir glass lg" style="--c:#7098b7"><span>Grasp</span><input type="range" min="-100" max="100" value="0" aria-label="Grasp"></label>
+        <label class="m-dir glass lg" style="--c:#e1b84e"><span>Claw</span><input type="range" min="-100" max="100" value="0" aria-label="Claw"></label>
+        <label class="m-dir glass lg" style="--c:#87a08b"><span>Twist</span><input type="range" min="-100" max="100" value="0" aria-label="Twist"></label>
+      </div>
+    </div>
+  </div>
+
+  <div class="fig1" id="fig1">
+    <div class="s2-in">
+      <h3 class="fig1-title">Action spaces and exploration noise</h3>
+      <p class="fig1-cap">We compare four formulations that differ in where the human directions enter: the actions, the exploration noise, or both. EigenDEXplore keeps the robot's joint actions and uses the human directions only in the noise.</p>
+      <div class="fig1-grid">
+      <figure class="f1p" data-k="joint" aria-label="Joint-Space">
+        <div class="f1-svg"></div>
+        <div class="f1-txt" aria-hidden="true"><b style="color:#7098B7">Joint-Space</b><span>Action: <em>Joint</em></span><span>Noise: <em>Joint</em></span><i class="bad">Unnatural postures</i></div>
+        <figcaption class="f1-rule"><span class="eqline">q<sup class="st">⋆</sup> = <span class="a">a<sub>q</sub></span> + <span class="n">σ<sub>q</sub> ⊙ η<sub>q</sub></span></span><span class="f1-meta"><span class="dims">22 actions</span></span></figcaption>
+      </figure>
+      <figure class="f1p" data-k="eigen" aria-label="Eigen-Space">
+        <div class="f1-svg"></div>
+        <div class="f1-txt" aria-hidden="true"><b style="color:#A08BAB">Eigen-Space</b><span>Action: <em>Eigen</em></span><span>Noise: <em>Eigen</em></span><i class="bad">Low expressivity</i></div>
+        <figcaption class="f1-rule"><span class="eqline">q<sup class="st">⋆</sup> = E<sup>⊤</sup>(<span class="a">a<sub>e</sub></span> + <span class="n">σ<sub>e</sub> ⊙ η<sub>e</sub></span>)</span><span class="f1-meta"><span class="dims">9 actions</span></span></figcaption>
+      </figure>
+      <figure class="f1p" data-k="residual" aria-label="Eigen-Residual">
+        <div class="f1-svg"></div>
+        <div class="f1-txt" aria-hidden="true"><b style="color:#87A08B">Eigen-Residual</b><span>Action: <em>Joint + Eigen</em></span><span>Noise: <em>Joint + Eigen</em></span><i class="bad">Redundant actions</i></div>
+        <figcaption class="f1-rule"><span class="eqline">q<sup class="st">⋆</sup> = <span class="a">a<sub>q</sub></span> + <span class="n">σ<sub>q</sub> ⊙ η<sub>q</sub></span> + E<sup>⊤</sup>(<span class="a">a<sub>e</sub></span> + <span class="n">σ<sub>e</sub> ⊙ η<sub>e</sub></span>)</span><span class="f1-meta"><span class="dims">22 + 9 = 31 actions</span></span></figcaption>
+      </figure>
+      <figure class="f1p" data-k="eigendex" aria-label="EigenDEXplore">
+        <div class="f1-svg"></div>
+        <div class="f1-txt" aria-hidden="true"><b style="color:#E1B84E">EigenDEXplore</b><span>Action: <em>Joint</em></span><span>Noise: <em>Joint + Eigen</em></span><i class="good">Expressive·Coordinated</i></div>
+        <figcaption class="f1-rule"><span class="eqline">q<sup class="st">⋆</sup> = <span class="a">a<sub>q</sub></span> + <span class="n">σ<sub>q</sub> ⊙ η<sub>q</sub></span> + E<sup>⊤</sup>(<span class="n">σ<sub>e</sub> ⊙ η<sub>e</sub></span>)</span><span class="f1-meta"><span class="dims">22 actions</span></span></figcaption>
+      </figure>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============================================================ SECTION 3 -->
+<div class="bleed b23" aria-hidden="true"></div>
+<section class="s3" id="training" aria-labelledby="s3-title">
+  <div class="s3-in">
+    <div class="sec-head">
+      <h2 id="s3-title">Watch both policies learn</h2>
+      <p class="lead"><strong>SimToolReal</strong> in simulation: same task, reward and training budget, only the exploration differs. Each frame replays a real checkpoint, from untrained to 60B frames.</p>
+    </div>
+    <div class="t-top">
+      <div class="seg glass lg" id="tStops" role="group" aria-label="Training checkpoint"><span class="seg-thumb" aria-hidden="true"></span></div>
+      <button class="round glass lg" id="tPlay" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-replay"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+    </div>
+    <div class="t-stage" id="tStage">
+      <div class="t-card" data-side="js"><span class="pill js lg">Joint&#8209;Space</span></div>
+      <div class="t-card" data-side="ours"><span class="pill ours lg">EigenDEXplore</span></div>
+      <canvas class="t-canvas" id="tCanvas" aria-label="The two policies at each training checkpoint, in 3D"></canvas>
+      <button class="t-reset glass btn lg" id="tReset" type="button">Reset view</button>
+      <div class="loading" id="s3loading"><span><span class="spinner"></span>Loading<span class="l"> the training runs</span></span><span><span class="spinner"></span>Loading<span class="l"> the training runs</span></span></div>
+    </div>
+    <div class="t-band" id="tBand" role="slider" tabindex="0" aria-label="Training frames" aria-valuemin="0" aria-valuemax="60" aria-valuenow="0">
+      <svg class="t-plot" id="tPlot" aria-hidden="true"></svg>
+      <span class="t-tag" id="tTag">Goal tolerance tightens</span>
+    </div>
+    <div class="t-more-row"><button class="t-more glass btn lg" id="tMore" type="button" aria-expanded="false" aria-controls="tPaper">All four methods, across seeds<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5 12 15.5 18 9.5"/></svg></button></div>
+    <div class="t-paper" id="tPaper" hidden><div class="t-paper-in"></div></div>
+  </div>
+</section>
+
+<!-- ============================================================ SECTION 4 -->
+<div class="bleed b34" aria-hidden="true"></div>
+<section class="s4" id="reorient" aria-labelledby="s4-title">
+  <div class="s4-in">
+    <div class="sec-head">
+      <h2 id="s4-title">Turning a cube in hand, on a real robot</h2>
+      <p class="lead">An Allegro hand turns a cube to a new random orientation each time it reaches the last one. Both policies were trained with RL in simulation with <strong>DeXtreme</strong> and run zero-shot on the real hand. A trial ends when the cube drops or stays stuck for 80 s.</p>
+    </div>
+    <div class="stage-top d-top">
+      <div class="seg small" id="dView" role="group" aria-label="View">
+        <button type="button" data-view="filmed" aria-pressed="true"><span class="l">Filmed runs</span><span class="s">Filmed</span></button>
+        <button type="button" data-view="3d" aria-pressed="false"><span class="l">3D replay</span><span class="s">3D</span></button>
+        <button type="button" data-view="trials" aria-pressed="false"><span class="l">More trials</span><span class="s">Trials</span></button>
+      </div>
+      <div class="seg small" id="dSpeed" role="group" aria-label="Speed">
+        <button type="button" data-speed="1" aria-pressed="true">1x</button>
+        <button type="button" data-speed="2" aria-pressed="false">2x</button>
+        <button type="button" data-speed="4" aria-pressed="false">4x</button>
+      </div>
+    </div>
+    <div class="cards d-cards" id="dCards">
+      <figure class="card" data-side="js">
+        <div class="media"><video class="fv" muted playsinline preload="none" disablepictureinpicture></video><video class="tv" muted playsinline preload="none" disablepictureinpicture></video></div>
+        <canvas class="d-ar" aria-hidden="true"></canvas>
+        <div class="ov">
+          <span class="pill js lg">Joint&#8209;Space</span>
+          <span class="chip lg" data-chip><span class="sp">1x</span><span class="dot">·</span><span class="tm">00:00</span></span>
+          <span class="d-goal" aria-hidden="true">Goal</span>
+          <span class="d-tgoal" aria-hidden="true"><canvas width="96" height="96"></canvas><span>Goal</span></span>
+          <span class="d-count" data-count><span class="top"><span class="n"><span class="r"><span>0</span></span></span><span class="w">successes</span></span><span class="end"></span></span>
+        </div>
+      </figure>
+      <figure class="card" data-side="ours">
+        <div class="media"><video class="fv" muted playsinline preload="none" disablepictureinpicture></video><video class="tv" muted playsinline preload="none" disablepictureinpicture></video></div>
+        <canvas class="d-ar" aria-hidden="true"></canvas>
+        <div class="ov">
+          <span class="pill ours lg">EigenDEXplore</span>
+          <span class="chip lg" data-chip><span class="sp">1x</span><span class="dot">·</span><span class="tm">00:00</span></span>
+          <span class="d-goal" aria-hidden="true">Goal</span>
+          <span class="d-tgoal" aria-hidden="true"><canvas width="96" height="96"></canvas><span>Goal</span></span>
+          <span class="d-count" data-count><span class="top"><span class="n"><span class="r"><span>0</span></span></span><span class="w">successes</span></span><span class="end"></span></span>
+        </div>
+      </figure>
+      <canvas class="replay" id="dReplay" aria-label="3D replay of the two runs. Drag to orbit, double-click to return to the filmed view."></canvas>
+      <div class="r3d-ui d-r3d" id="dR3d"><button class="r3d-reset glass btn lg" id="dReset" title="Back to the camera that filmed the run">Reset view</button></div>
+    </div>
+    <div class="transport glass lg d-transport">
+      <button class="round" id="dPlay" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-replay"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+      <div class="scrub" id="dScrub" role="slider" tabindex="0" aria-label="Run time" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0">
+        <div class="rail"><div class="track"><div class="fill"></div></div><div class="marks"></div><div class="knob lg" data-lg-blur="1"></div></div>
+      </div>
+      <span class="clock" id="dClock">0:00</span>
+      <div class="seg small" id="dTrial" aria-label="Trial" hidden>
+        <button data-k="lq" aria-pressed="false" title="Lower quartile of the 40 trials"><span class="l">Lower quartile</span><span class="s">Lower</span></button>
+        <button data-k="median" aria-pressed="true" title="Median of the 40 trials">Median</button>
+        <button data-k="uq" aria-pressed="false" title="Upper quartile of the 40 trials"><span class="l">Upper quartile</span><span class="s">Upper</span></button>
+        <button data-k="best" aria-pressed="false" title="Best of the 40 trials">Best</button>
+      </div>
+    </div>
+    <p class="fine d-note" id="dNote">Two runs filmed in a separate session. The goal and the successes come from the robot's log.</p>
+    <div class="d-score glass panel" id="dScore" aria-live="polite"></div>
+    <div class="t-more-row"><button class="t-more glass btn lg" id="dMore" type="button" aria-expanded="false" aria-controls="dPaper">All four methods in training, across seeds<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5 12 15.5 18 9.5"/></svg></button></div>
+    <div class="t-paper d-paper" id="dPaper" hidden><div class="t-paper-in"></div></div>
+  </div>
+</section>
+<div class="bleed b45" aria-hidden="true"></div>
+
+<!-- ============================================================ SECTION 5 -->
+<section class="s5" id="hands" aria-labelledby="s5-title">
+  <div class="h-blk" data-kind="dm" id="hDM">
+    <div class="h-bgs" aria-hidden="true"><div class="h-bg"></div></div>
+    <div class="h-in">
+      <div class="sec-head">
+        <h2 id="s5-title">Tracking bimanual human demonstrations with RL</h2>
+        <p class="lead">Reference-guided bimanual RL with <strong>DexMachina</strong>, from the <strong>task reward only</strong>: two hands learn to move a box or a notebook along a human demonstration (ARCTIC), rewarded only on how closely the object follows it, with no curriculum or helper rewards. EigenDEXplore helps most on the high-DoF hands.</p>
+      </div>
+      <div class="t-top h-top">
+        <div class="seg glass lg h-shot" role="group" aria-label="DexMachina task"><span class="seg-thumb" aria-hidden="true"></span><button type="button" data-shot="box" aria-pressed="true">Box<span class="k">Allegro</span></button><button type="button" data-shot="notebook" aria-pressed="false">Notebook<span class="k">Schunk</span></button></div>
+        <div class="seg small h-speed" role="group" aria-label="Speed"><button type="button" data-speed="0.25" aria-pressed="false">¼x</button><button type="button" data-speed="0.5" aria-pressed="true">½x</button><button type="button" data-speed="1" aria-pressed="false">1x</button></div>
+        <button class="round glass lg h-play" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-replay"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+      </div>
+      <div class="t-stage h-stage">
+        <div class="t-card" data-side="js"><span class="pill js lg">Joint&#8209;Space</span></div>
+        <div class="t-card" data-side="ours"><span class="pill ours lg">EigenDEXplore</span></div>
+        <canvas class="t-canvas h-canvas" aria-label="The two DexMachina rollouts in 3D. Drag to turn the view, double-click to reset it."></canvas>
+        <canvas class="h-snap" aria-hidden="true"></canvas>
+        <button class="t-reset glass btn lg h-reset" type="button">Reset view</button>
+        <div class="loading"><span><span class="spinner"></span>Loading<span class="l"> the 3D scene</span></span><span><span class="spinner"></span>Loading<span class="l"> the 3D scene</span></span></div>
+      </div>
+      <div class="t-band h-band" role="slider" tabindex="0" aria-label="DexMachina rollout time" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="h-pw"></div></div>
+      <div class="t-more-row"><button class="t-more glass btn lg h-more" type="button" aria-expanded="false" aria-controls="hDMPaper">All four hands<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5 12 15.5 18 9.5"/></svg></button></div>
+      <div class="t-paper h-paper" id="hDMPaper" hidden><div class="t-paper-in"></div></div>
+    </div>
+  </div>
+  <div class="bleed b5m" aria-hidden="true"></div>
+  <div class="h-blk" data-kind="sp" id="hSP">
+    <div class="h-bgs" aria-hidden="true"><div class="h-bg"></div></div>
+    <div class="h-in">
+      <div class="sec-head">
+        <h2 id="s5sp-title">Retargeting human demonstrations with sampling</h2>
+        <p class="lead">Trajectory optimization with <strong>SPIDER</strong>, from a <strong>cold start</strong>: it retargets a human demonstration (OakInk2) to a robot hand by sampling candidate trajectories and refining the best, with the same budget for both methods. EigenDEXplore only changes how the samples are drawn, and lowers the cost on every hand, most on the highest-DoF ones.</p>
+      </div>
+      <div class="t-top h-top">
+        <div class="seg glass lg h-shot" role="group" aria-label="SPIDER task"><span class="seg-thumb" aria-hidden="true"></span><button type="button" data-shot="pencil" aria-pressed="true">Pencil<span class="k">Wuji</span></button><button type="button" data-shot="spoon" aria-pressed="false">Spoon<span class="k">Wuji</span></button></div>
+        <div class="seg small h-speed" role="group" aria-label="Speed"><button type="button" data-speed="0.25" aria-pressed="false">¼x</button><button type="button" data-speed="0.5" aria-pressed="true">½x</button><button type="button" data-speed="1" aria-pressed="false">1x</button></div>
+        <button class="round glass lg h-play" aria-label="Play"><svg viewBox="0 0 24 24" class="i-play"><path d="M8 5.5v13l10.5-6.5z"/></svg><svg viewBox="0 0 24 24" class="i-pause"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z"/></svg><svg viewBox="0 0 24 24" class="i-replay"><path class="arc" d="M12 4.9a7.6 7.6 0 1 1-7.6 7.6"/><path d="M7.3 4.9 12.9 1.3v7.2z"/></svg></button>
+      </div>
+      <div class="t-stage h-stage">
+        <div class="t-card" data-side="js"><span class="pill js lg">Joint&#8209;Space</span></div>
+        <div class="t-card" data-side="ours"><span class="pill ours lg">EigenDEXplore</span></div>
+        <canvas class="t-canvas h-canvas" aria-label="The two SPIDER rollouts in 3D. Drag to turn the view, double-click to reset it."></canvas>
+        <canvas class="h-snap" aria-hidden="true"></canvas>
+        <button class="t-reset glass btn lg h-reset" type="button">Reset view</button>
+        <div class="loading"><span><span class="spinner"></span>Loading<span class="l"> the 3D scene</span></span><span><span class="spinner"></span>Loading<span class="l"> the 3D scene</span></span></div>
+      </div>
+      <div class="t-band h-band" role="slider" tabindex="0" aria-label="SPIDER rollout time" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"><div class="h-pw"></div></div>
+      <div class="t-more-row"><button class="t-more glass btn lg h-more" type="button" aria-expanded="false" aria-controls="hSPPaper">All six hands<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9.5 12 15.5 18 9.5"/></svg></button></div>
+      <div class="t-paper h-paper" id="hSPPaper" hidden><div class="t-paper-in"></div></div>
+    </div>
+  </div>
+</section>
+<div class="bleed b5f" aria-hidden="true"></div>
+
+<footer class="foot">
+  <section class="ack glass panel" aria-labelledby="ack-t">
+    <h2 id="ack-t">Acknowledgments</h2>
+    <p>We thank all members of IPRL and REALab at Stanford for helpful discussions and feedback. This work was supported in part by the National Science Foundation (NSF) under Grant Numbers 2342246, 2327974, 2143601, 2037101, and 2132519. Tyler Ga Wei Lum is supported by the Natural Sciences and Engineering Research Council of Canada (NSERC) under Award Number 526541680.</p>
+  </section>
+  <p>EigenDEXplore · Stanford University</p>
+</footer>
+
+<script type="module" src="js/main.js?v=20261006c"></script>
 </body>
 </html>

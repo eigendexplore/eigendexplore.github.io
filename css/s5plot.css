@@ -1,0 +1,77 @@
+/* Section 5's plot band (js/p5plot.js), inside the band's dark glass (.t-band.h-band). Section 3's band exactly (css/site.css
+   .t-plot, .t-tag: the type, the 2.4 px curves with their halos, the knobs, the playhead, the readout, the coral event)
+   with the video's part-5 slab content on top (video/scripts/method/p5_plot.py: the title's tag, "lower is better", the
+   gold verdict capsule with ours shining and the gap striped gold, the dropped object). */
+.p5p { --p5p-js: #7098b7; --p5p-ours: #e1b84e; --p5p-ev: #ec6852; position: absolute; inset: 0; pointer-events: none;
+  font-family: var(--font, -apple-system, BlinkMacSystemFont, "SF Pro Text", system-ui, sans-serif); line-height: 1.25; }
+/* one run per layer: a new run fades in over the old one fading out (never a blank band) */
+.p5p-run { position: absolute; inset: 0; transition: opacity .34s cubic-bezier(.2, .7, .3, 1); }
+.p5p-run.enter { opacity: 0; transition: none; }
+.p5p-run.out { opacity: 0; transition: opacity .3s cubic-bezier(.7, 0, .8, .3); }
+.p5p-svg { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+
+/* type (= .t-plot: text, .tt, .rv, .rk) */
+.p5p-svg text { fill: rgba(255,255,255,.62); font-size: 12px; font-weight: 500; font-variant-numeric: tabular-nums; }
+.p5p-svg .tt { fill: rgba(255,255,255,.92); font-size: 14.5px; font-weight: 650; }
+.p5p-svg .tg { fill: rgba(255,255,255,.8); font-size: 12px; font-weight: 500; }
+.p5p-svg .sb { fill: rgba(255,255,255,.5); font-size: 12px; font-weight: 500; }
+.p5p-svg .rv { fill: #fff; font-size: 17px; font-weight: 700; }
+.p5p-svg .rk { fill: rgba(255,255,255,.58); font-size: 12px; }
+.p5p-svg .rv, .p5p-svg .rk { transition: opacity .35s ease; }
+.p5p-run.done .rv, .p5p-run.done .rk { opacity: 0; }       /* the verdict takes the readout's place */
+.p5p-svg .vh { transition: fill-opacity .35s ease; }
+.p5p-run.done .vh { fill-opacity: 0; }                    /* title parts the verdict needs the room of (phones) */
+
+/* curves: fill, halo, line (= section 3), ours' core once the verdict is in */
+.p5p-svg .st.js { stop-color: var(--p5p-js); } .p5p-svg .st.ours { stop-color: var(--p5p-ours); }
+.p5p-svg .ln, .p5p-svg .halo, .p5p-svg .core { fill: none; stroke-linejoin: round; stroke-linecap: round; }
+.p5p-svg .ln { stroke-width: 2.4; }
+.p5p-svg .halo { stroke-width: 7; stroke-opacity: .22; transition: stroke-opacity .55s ease, stroke-width .55s ease; }
+.p5p-svg .ln.js, .p5p-svg .halo.js { stroke: var(--p5p-js); }
+.p5p-svg .ln.ours, .p5p-svg .halo.ours { stroke: var(--p5p-ours); }
+.p5p-svg .core { stroke: #fff6d6; stroke-width: 1; stroke-opacity: 0; transition: stroke-opacity .55s ease; }
+.p5p-run.done .halo.ours { stroke-opacity: .42; stroke-width: 10; }
+.p5p-run.done .core { stroke-opacity: .7; }
+/* the verdict's gap: gold stripes between Joint-Space's curve (above) and ours */
+.p5p-svg .gap { opacity: 0; transition: opacity .6s ease; }
+.p5p-svg .stripe { fill: var(--p5p-ours); fill-opacity: .46; }
+.p5p-run.done .gap { opacity: 1; }
+
+/* playhead and knobs (= section 3) */
+.p5p-svg .head { stroke: #fff; stroke-opacity: .75; stroke-width: 1.5; }
+.p5p-svg .knob { fill-opacity: .55; stroke: #fff; stroke-opacity: .85; stroke-width: 1.5; }
+.p5p-svg .knob.js { fill: var(--p5p-js); } .p5p-svg .knob.ours { fill: var(--p5p-ours); }
+
+/* the dropped object (= section 3's tolerance event, its coral): on the axis from the start, the line, its glow, the
+   zone after it and the capsule once the playhead is past */
+.p5p-svg .ev-dot { fill: var(--p5p-ev); stroke: rgba(0,0,0,.35); stroke-width: 1; }
+.p5p-svg .ev-line { stroke: var(--p5p-ev); stroke-width: 2; opacity: 0; transition: opacity .45s ease; }
+.p5p-svg .ev-glow { stroke: var(--p5p-ev); stroke-width: 7; stroke-linecap: round; opacity: 0; transition: opacity .45s ease; }
+.p5p-svg .ev-zone { fill: var(--p5p-ev); fill-opacity: .07; opacity: 0; transition: opacity .45s ease; }
+.p5p-svg .ev-line.on, .p5p-svg .ev-zone.on { opacity: 1; } .p5p-svg .ev-glow.on { opacity: .35; }
+.p5p-tag { position: absolute; padding: 4px 11px; border-radius: 999px; font-size: 12.5px; font-weight: 650; color: #fff; white-space: nowrap;
+  background: rgba(236, 104, 82, .82); box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 4px 14px rgba(236,104,82,.35);
+  opacity: 0; transform: translateY(6px); transition: opacity .4s ease, transform .5s cubic-bezier(.2, .8, .2, 1); }
+.p5p-tag.on { opacity: 1; transform: none; }
+
+/* the verdict: the video's gold glass capsule, in the readout's place once both runs are done */
+.p5p-vd { position: absolute; padding: 4px 12px; border-radius: 999px; font-size: 13.5px; font-weight: 700; color: #fff; white-space: nowrap;
+  font-variant-numeric: tabular-nums; text-shadow: 0 1px 1.5px rgba(90, 64, 8, .45);
+  background: linear-gradient(180deg, rgba(232, 196, 96, .96), rgba(196, 154, 50, .96));
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.5), inset 0 -1px 0 rgba(120, 84, 10, .25), 0 0 0 .5px rgba(255, 236, 180, .35), 0 4px 16px rgba(225, 184, 78, .38);
+  opacity: 0; transform: translateY(6px); transition: opacity .45s ease, transform .55s cubic-bezier(.2, .8, .2, 1); }
+.p5p-run.done .p5p-vd { opacity: 1; transform: none; }
+
+@media (max-width: 759px) {                                  /* = section 3's phone type */
+  .p5p-svg text { font-size: 11px; }
+  .p5p-svg .tt { font-size: 13px; }
+  .p5p-svg .rv { font-size: 15px; }
+  .p5p-svg .tg, .p5p-svg .sb { font-size: 11px; }
+  .p5p-tag { font-size: 11px; padding: 3px 9px; }
+  .p5p-vd { font-size: 11.5px; padding: 3px 9px; }
+  .p5p-svg .halo { stroke-width: 5.5; } .p5p-run.done .halo.ours { stroke-width: 8; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .p5p-run, .p5p-run.out, .p5p-tag, .p5p-vd, .p5p-svg .rv, .p5p-svg .rk, .p5p-svg .vh, .p5p-svg .halo, .p5p-svg .core, .p5p-svg .gap,
+  .p5p-svg .ev-line, .p5p-svg .ev-glow, .p5p-svg .ev-zone { transition: none; }
+}

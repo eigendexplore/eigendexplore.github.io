@@ -1,0 +1,246 @@
+{
+ "hammer_js": {
+  "source": "C0129.MP4",
+  "source_start": 1.533,
+  "duration": 15.248,
+  "task_start_in_clip": 1.0
+ },
+ "hammer_ours": {
+  "source": "C0128.MP4",
+  "source_start": 656.115,
+  "duration": 10.284,
+  "task_start_in_clip": 1.0
+ },
+ "hammer": {
+  "timeline": {
+   "task": "hammer",
+   "start": {
+    "ours": 657.115,
+    "js": 2.533
+   },
+   "length": 7.509,
+   "speedups": [
+    {
+     "from": 1.4,
+     "to": 3.6,
+     "ours": 1.612,
+     "js": 4.063
+    },
+    {
+     "from": 5.05,
+     "to": 6.35,
+     "ours": 1.33,
+     "js": 1.0
+    }
+   ],
+   "hold": {},
+   "dims": [],
+   "outlines": [],
+   "labels": [],
+   "events": []
+  }
+ },
+ "wipe_js": {
+  "source": "C0134.MP4",
+  "source_start": 294.6,
+  "duration": 10.2,
+  "task_start_in_clip": 1.0,
+  "note": "source capped at 304.8 s: a person walks in at 305 s"
+ },
+ "wipe_ours": {
+  "source": "C0134.MP4",
+  "source_start": 22.0,
+  "duration": 14.4,
+  "task_start_in_clip": 1.0
+ },
+ "wipe": {
+  "timeline": {
+   "task": "wipe",
+   "start": {
+    "ours": 23.0,
+    "js": 295.6
+   },
+   "length": 10.6,
+   "speedups": [
+    {
+     "from": 0.4,
+     "to": 3.0,
+     "ours": 1.5,
+     "js": 2.038
+    }
+   ],
+   "hold": {
+    "js": 304.6,
+    "ours": 36.4
+   },
+   "dims": [
+    {
+     "side": "ours",
+     "watch": "js",
+     "from": 301.7,
+     "u_to": 6.69
+    },
+    {
+     "side": "js",
+     "u_from": 6.69,
+     "u_to": 99.0,
+     "keep_magnifier": true
+    }
+   ],
+   "outlines": [
+    {
+     "side": "js",
+     "mask": "wipe_js_scrubber",
+     "t": 303.3,
+     "label": "scrubber dropped",
+     "bad": true,
+     "place": "below"
+    }
+   ],
+   "labels": [
+    {
+     "side": "ours",
+     "t": 33.5,
+     "label": "drawing wiped off",
+     "at": "magnifier",
+     "good": true
+    }
+   ],
+   "events": [],
+   "magnifier": true,
+   "magnifier_from": {
+    "js": 4.9,
+    "ours": 8.8
+   },
+   "magnifier_offset": [
+    -370,
+    280
+   ]
+  }
+ },
+ "brush_js": {
+  "source": "C0127.MP4",
+  "source_start": 13.6,
+  "duration": 14.699,
+  "task_start_in_clip": 1.0
+ },
+ "brush_ours": {
+  "source": "C0125.MP4",
+  "source_start": 246.0,
+  "duration": 18.1,
+  "task_start_in_clip": 1.0
+ },
+ "brush": {
+  "timeline": {
+   "task": "brush",
+   "start": {
+    "ours": 247.0,
+    "js": 14.6
+   },
+   "length": 13.2,
+   "speedups": [
+    {
+     "from": 0.6,
+     "to": 3.0,
+     "ours": 2.625,
+     "js": 1.208
+    }
+   ],
+   "hold": {
+    "js": 24.2,
+    "ours": 261.6
+   },
+   "dims": [],
+   "outlines": [
+    {
+     "side": "js",
+     "mask": "brush_js_crumbs2",
+     "t": 24.2,
+     "label": "crumbs left behind",
+     "bad": true,
+     "appear_side": "ours",
+     "appear_t": 261.6
+    },
+    {
+     "side": "ours",
+     "mask": "brush_ours_crumbs2",
+     "t": 261.6,
+     "label": "crumbs in the pan"
+    }
+   ],
+   "labels": [],
+   "events": []
+  }
+ },
+ "scoop_js": {
+  "source": "C0132.MP4",
+  "source_start": 22.0,
+  "duration": 10.4,
+  "task_start_in_clip": 1.0,
+  "note": "trimmed at 10.4 s: a person reaches in from the left at ~10.6 s"
+ },
+ "scoop_ours": {
+  "source": "C0131.MP4",
+  "source_start": 500.0,
+  "duration": 23.201,
+  "task_start_in_clip": 1.0
+ },
+ "scoop": {
+  "timeline": {
+   "task": "scoop",
+   "start": {
+    "ours": 501.0,
+    "js": 23.0
+   },
+   "length": 11.9,
+   "speedups": [
+    {
+     "from": 0.4,
+     "to": 2.7,
+     "ours": 3.783,
+     "js": 1.0
+    },
+    {
+     "from": 4.7,
+     "to": 6.7,
+     "ours": 2.95,
+     "js": 1.0
+    }
+   ],
+   "hold": {
+    "js": 30.4,
+    "ours": 522.2
+   },
+   "dims": [
+    {
+     "side": "ours",
+     "watch": "js",
+     "from": 26.2,
+     "u_to": 6.88
+    },
+    {
+     "side": "js",
+     "u_from": 6.88,
+     "u_to": 99.0
+    }
+   ],
+   "outlines": [
+    {
+     "side": "js",
+     "mask": "scoop_js_spatula",
+     "t": 28.2,
+     "label": "spatula dropped",
+     "bad": true
+    },
+    {
+     "side": "ours",
+     "mask": "scoop_ours_food",
+     "t": 520.65,
+     "label": "object transport"
+    }
+   ],
+   "labels": [],
+   "events": []
+  }
+ }
+}

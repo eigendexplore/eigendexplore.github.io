@@ -1,0 +1,223 @@
+{
+ "note": "Blender world W (z up); the page wraps it in Z2Y. Lights: disk area lights as squares of equal area, radiance = W / (area pi), m = the light's matrix (-z = its axis); hand_gain = what the dark hand parts receive of each (the video's light linking). env: the bowl's baked light / env_scale.",
+ "task": "pencil",
+ "rig": "spider",
+ "lights": [
+  {
+   "name": "key",
+   "m": [
+    [
+     -0.8439890146255493,
+     0.32993176579475403,
+     -0.422880083322525,
+     -1.1286394596099854
+    ],
+    [
+     -0.5363604426383972,
+     -0.5191635489463806,
+     0.6654221415519714,
+     1.9806344509124756
+    ],
+    [
+     -2.289560718793382e-08,
+     0.7884251475334167,
+     0.6151306629180908,
+     2.5999999046325684
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.215567313631895,
+   "radiance": 24.641311861816547,
+   "energy": 380.0,
+   "shape": "DISK",
+   "size": 2.5,
+   "hand_gain": 0.7
+  },
+  {
+   "name": "fill",
+   "m": [
+    [
+     -0.3403615653514862,
+     -0.3417337238788605,
+     0.8759977221488953,
+     2.3124794960021973
+    ],
+    [
+     0.940294623374939,
+     -0.12369832396507263,
+     0.31708788871765137,
+     0.7646164298057556
+    ],
+    [
+     -1.7196273915942584e-07,
+     0.9316205382347107,
+     0.36343255639076233,
+     1.599999976158142
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.658680776358274,
+   "radiance": 8.668590156066676,
+   "energy": 192.5,
+   "shape": "DISK",
+   "size": 3.0,
+   "hand_gain": 0.0
+  },
+  {
+   "name": "top",
+   "m": [
+    [
+     0.9848077893257141,
+     0.17361325025558472,
+     -0.003472839016467333,
+     0.13448622822761536
+    ],
+    [
+     -0.17364798486232758,
+     0.9846108555793762,
+     -0.01969379372894764,
+     -0.06985653936862946
+    ],
+    [
+     2.914437970957806e-07,
+     0.019997652620077133,
+     0.9998000264167786,
+     3.2
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.658680776358274,
+   "radiance": 19.138445799108247,
+   "energy": 425.0,
+   "shape": "DISK",
+   "size": 3.0,
+   "hand_gain": 0.0
+  },
+  {
+   "name": "rim",
+   "m": [
+    [
+     0.9939343929290771,
+     -0.06176753342151642,
+     0.09099005907773972,
+     0.3780745267868042
+    ],
+    [
+     0.10997463017702103,
+     0.5582458972930908,
+     -0.8223546147346497,
+     -2.1436610221862793
+    ],
+    [
+     -1.0115589255121904e-08,
+     0.8273731470108032,
+     0.561652660369873,
+     2.200000047683716
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 1.7724538509055159,
+   "radiance": 16.211389382774044,
+   "energy": 160.0,
+   "shape": "DISK",
+   "size": 2.0,
+   "hand_gain": 0.7
+  }
+ ],
+ "world": 0.3499999940395355,
+ "exposure": -2.8,
+ "look": "AgX - Medium High Contrast",
+ "env_scale": 8.0,
+ "dark": [],
+ "materials": {
+  "Matte black elastomer": {
+   "nodes": [
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.010022825561463833,
+    0.011645430698990822,
+    0.0134117491543293
+   ],
+   "rough": 0.699999988079071,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": false
+  },
+  "Silver mechanism": {
+   "nodes": [
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.295699805021286,
+    0.31854677200317383,
+    0.34239163994789124
+   ],
+   "rough": 0.3199999928474426,
+   "metal": 0.699999988079071,
+   "coat": 0.0,
+   "base_linked": false
+  },
+  "Satin light casing": {
+   "nodes": [
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.6559306979179382,
+    0.6738595366477966,
+    0.6920710802078247
+   ],
+   "rough": 0.36000001430511475,
+   "metal": 0.20000000298023224,
+   "coat": 0.0,
+   "base_linked": false
+  },
+  "sl_object": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial",
+    "ShaderNodeVertexColor"
+   ],
+   "rgb": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929
+   ],
+   "rough": 0.44999998807907104,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": true
+  }
+ },
+ "floor_z": 0.0,
+ "source": {
+  "seq": "/local/real/harshgup/eigendex-video/renders/part5_v3/seq/sp_pencil_iid",
+  "scene_module": "/local/real/harshgup/eigendex-video/renders/part5_v3/scripts/v3_scene.py"
+ }
+}

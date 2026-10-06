@@ -1,0 +1,255 @@
+{
+ "note": "Blender world W (z up); the page wraps it in Z2Y. Lights: disk area lights as squares of equal area, radiance = W / (area pi), m = the light's matrix (-z = its axis); hand_gain = what the dark hand parts receive of each (the video's light linking). env: the bowl's baked light / env_scale.",
+ "task": "notebook",
+ "rig": "dm_notebook",
+ "lights": [
+  {
+   "name": "key",
+   "m": [
+    [
+     -0.8439890146255493,
+     0.2799523174762726,
+     -0.4575032591819763,
+     -1.3661038875579834
+    ],
+    [
+     -0.5363604426383972,
+     -0.4405185878276825,
+     0.7199033498764038,
+     1.7982383966445923
+    ],
+    [
+     -8.546881957727237e-08,
+     0.8529771566390991,
+     0.5219482183456421,
+     2.5999999046325684
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.215567313631895,
+   "radiance": 24.641311861816547,
+   "energy": 380.0,
+   "shape": "DISK",
+   "size": 2.5,
+   "hand_gain": 0.7
+  },
+  {
+   "name": "fill",
+   "m": [
+    [
+     -0.34036147594451904,
+     -0.19952747225761414,
+     0.9188812971115112,
+     2.075015068054199
+    ],
+    [
+     0.9402946829795837,
+     -0.07222349941730499,
+     0.33261042833328247,
+     0.5822203159332275
+    ],
+    [
+     -9.14392899176164e-08,
+     0.977226972579956,
+     0.2121967226266861,
+     1.599999976158142
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.658680776358274,
+   "radiance": 8.668590156066676,
+   "energy": 192.5,
+   "shape": "DISK",
+   "size": 3.0,
+   "hand_gain": 0.0
+  },
+  {
+   "name": "top",
+   "m": [
+    [
+     0.9848077297210693,
+     0.1735990345478058,
+     -0.00413134740665555,
+     -0.10297815501689911
+    ],
+    [
+     -0.1736481934785843,
+     0.9845290184020996,
+     -0.02343026176095009,
+     -0.25225260853767395
+    ],
+    [
+     -3.963364747505693e-08,
+     0.023791704326868057,
+     0.9997169375419617,
+     3.2
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 2.658680776358274,
+   "radiance": 19.138445799108247,
+   "energy": 425.0,
+   "shape": "DISK",
+   "size": 3.0,
+   "hand_gain": 0.0
+  },
+  {
+   "name": "rim",
+   "m": [
+    [
+     0.9939343929290771,
+     -0.048551253974437714,
+     0.09867720305919647,
+     0.14061014354228973
+    ],
+    [
+     0.10997461527585983,
+     0.43879929184913635,
+     -0.8918300271034241,
+     -2.326056957244873
+    ],
+    [
+     -2.3918337532791156e-08,
+     0.897272527217865,
+     0.44147711992263794,
+     2.200000047683716
+    ],
+    [
+     0.0,
+     0.0,
+     0.0,
+     1.0
+    ]
+   ],
+   "side": 1.7724538509055159,
+   "radiance": 16.211389382774044,
+   "energy": 160.0,
+   "shape": "DISK",
+   "size": 2.0,
+   "hand_gain": 0.7
+  }
+ ],
+ "world": 0.3499999940395355,
+ "exposure": -2.8,
+ "look": "AgX - Medium High Contrast",
+ "env_scale": 8.0,
+ "dark": [
+  "schunk_dark"
+ ],
+ "materials": {
+  "schunk_dark": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBevel",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.00854038167744875,
+    0.010022825561463833,
+    0.011645430698990822
+   ],
+   "rough": 0.699999988079071,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": false
+  },
+  "schunk_silver": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBevel",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.295699805021286,
+    0.31854677200317383,
+    0.34239163994789124
+   ],
+   "rough": 0.36000001430511475,
+   "metal": 0.699999988079071,
+   "coat": 0.0,
+   "base_linked": false
+  },
+  "v3_notebook_bottom": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial",
+    "ShaderNodeTexImage"
+   ],
+   "rgb": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929
+   ],
+   "rough": 0.550000011920929,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": true
+  },
+  "v3_notebook_top": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial",
+    "ShaderNodeTexImage"
+   ],
+   "rgb": [
+    0.800000011920929,
+    0.800000011920929,
+    0.800000011920929
+   ],
+   "rough": 0.550000011920929,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": true
+  },
+  "v3_support_white": {
+   "nodes": [
+    "ShaderNodeAttribute",
+    "ShaderNodeBsdfPrincipled",
+    "ShaderNodeBsdfTransparent",
+    "ShaderNodeMixShader",
+    "ShaderNodeOutputMaterial"
+   ],
+   "rgb": [
+    0.7874122858047485,
+    0.7874122858047485,
+    0.7874122858047485
+   ],
+   "rough": 0.949999988079071,
+   "metal": 0.0,
+   "coat": 0.0,
+   "base_linked": false
+  }
+ },
+ "floor_z": 0.0,
+ "source": {
+  "seq": "/local/real/harshgup/eigendex-video/renders/part5_v3/seq/dm_notebook_jspace",
+  "scene_module": "/local/real/harshgup/eigendex-video/renders/part5_v3/scripts/v3_scene.py"
+ }
+}

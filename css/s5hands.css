@@ -1,0 +1,184 @@
+/* Section 5's fold-outs (js/p5hands.js): the result on every hand, one compact panel in the band's dark glass, drawn
+   like section 3's paper panel (its head, legend, glass bars, whiskers, numbers under the bars, caption). Each hand is a
+   group: its render (the video's look, transparent, one physical scale) beside or under its bars, the replay's hand
+   ringed in gold.
+   Every size is fixed per width (or per viewport width), so the panel lays out while it is still shut and its spacing
+   is inside it.
+   Layouts: wide screens put each hand beside its bars, narrower ones put SPIDER's hands under the bars. Phones show both
+   panels in one format: one row of hand columns (bars, hand, name and DoF), then a ribbon of numbers under the bars
+   (SPIDER's cost saved per hand, DexMachina's gain under each setup's pair), DexMachina's two setups named once in a key. */
+.p5h { --ease: cubic-bezier(.45, 0, .2, 1); --gap: 6px; --cw: 70px; --th: 84px; --bh: 92px; --hd: 8px; --bw: 26px; --pg: 5px; --gut: 0px; --g1: 18px;
+  color: #fff; font-variant-numeric: tabular-nums; }
+.p5h .s { display: none; }
+
+/* head: the title and its axis, the legend (tap a method to bring it forward) and the key for the ring */
+.p5h-head { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; }
+.p5h-head h3 { margin: 0; font-size: 14.5px; font-weight: 650; line-height: 1.3; color: rgba(255,255,255,.92); }
+.p5h-task { display: inline-block; }
+.p5h .p5h-t3 { display: none; }
+.p5h-axis { font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.55); white-space: nowrap; }
+.p5h-legend { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 6px; margin-left: auto; }
+.p5h-legend button { display: inline-flex; align-items: center; gap: 6px; border: 0; padding: 4px 10px 4px 8px; min-height: 28px; border-radius: 999px;
+  font-weight: 600; font-size: 12.5px; color: rgba(255,255,255,.86); background: rgba(255,255,255,.07); box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
+  transition: background .25s, box-shadow .25s; -webkit-tap-highlight-color: transparent; }
+.p5h-legend button:hover { background: rgba(255,255,255,.11); }
+.p5h-legend button[aria-pressed="true"] { background: rgba(255,255,255,.16); box-shadow: inset 0 0 0 1.5px var(--c); }
+.p5h-legend button:focus-visible { outline: 2px solid rgba(255,255,255,.8); outline-offset: 2px; }
+.p5h-legend button i { width: 9px; height: 9px; border-radius: 50%; background: var(--c); box-shadow: 0 0 6px var(--c); flex: none; }
+.p5h-key { display: inline-flex; align-items: center; gap: 6px; padding: 4px 4px 4px 6px; min-height: 28px; font-size: 12.5px; font-weight: 600; color: rgba(255,255,255,.62); white-space: nowrap; }
+.p5h-key i { width: 13px; height: 13px; border-radius: 4px; background: rgba(225,184,78,.12); box-shadow: inset 0 0 0 1.5px rgba(225,184,78,.62); flex: none; }
+/* DexMachina's setup key (phones only, where the pairs carry no names): a little column of four bars, the named pair lit */
+.p5h-sk { display: none; }
+.p5h-sk span { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
+.p5h-sk i { flex: none; width: 19px; height: 9px; --a: rgba(255,255,255,.2); --b: rgba(255,255,255,.2);
+  background: linear-gradient(90deg, var(--a) 0 3px, transparent 3px 4px, var(--a2, var(--a)) 4px 7px, transparent 7px 9px, rgba(255,255,255,.34) 9px 10px,
+    transparent 10px 12px, var(--b) 12px 15px, transparent 15px 16px, var(--b2, var(--b)) 16px 19px); }
+.p5h-sk i.objdex { --a: #7098b7; --a2: #e1b84e; }
+.p5h-sk i.full { --b: #7098b7; --b2: #e1b84e; }
+
+/* the hands */
+.p5h-grid { display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: var(--gap); margin-top: 8px; }
+.p5h-g { position: relative; display: grid; grid-template-columns: var(--cw) minmax(0, 1fr); gap: 0 8px; align-items: start; padding: 7px 7px 6px; border-radius: 14px; }
+.p5h-g::before { content: ""; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; opacity: 0; transition: opacity .45s ease;
+  background: rgba(225,184,78,.075); box-shadow: inset 0 0 0 1.5px rgba(225,184,78,.55); }
+.p5h-g.cur::before { opacity: 1; }
+.p5h-chip { min-width: 0; display: flex; flex-direction: column; align-items: center; }
+/* a hand: every render is the same canvas (227 x 272, the same px per metre, the floor on the same row), all shown at one
+   height, so their sizes compare as the real hands' do. A faint studio pool behind lifts the dark housings off the glass. */
+.p5h-tile { position: relative; height: var(--th); aspect-ratio: 227 / 272; max-width: 100%; }
+.p5h-tile::before { content: ""; position: absolute; inset: 6% -14% -2%; pointer-events: none;
+  background: radial-gradient(closest-side, rgba(255,255,255,var(--pool, .075)), rgba(255,255,255,0)); }
+.p5h-tile img { position: relative; display: block; width: 100%; height: 100%; object-fit: contain; object-position: 50% 100%; opacity: 0; transition: opacity .3s ease;
+  -webkit-user-select: none; user-select: none; }
+.p5h-tile img.on { opacity: 1; }
+.p5h-hn { margin-top: 1px; text-align: center; line-height: 1.25; white-space: nowrap; }
+.p5h-hn b { display: block; font-size: 12.5px; font-weight: 650; color: rgba(255,255,255,.94); transition: color .45s ease; }
+.p5h-hn span { display: block; font-size: 10.5px; font-weight: 500; color: rgba(255,255,255,.5); }
+.p5h-g.cur .p5h-hn b { color: #ecc865; }
+
+/* a hand's bars: one pair per setup, the scale (grid, ticks) behind them; ticks in each row's first hand */
+.p5h-plot { position: relative; min-width: 0; display: flex; justify-content: space-around; padding-left: var(--gut); }
+.p5h-g:first-child { --gut: var(--g1); }
+.p5h-scale { position: absolute; left: var(--gut); right: 0; top: var(--hd); height: calc(var(--bh) - var(--hd)); pointer-events: none; }
+.p5h-gl { position: absolute; left: 0; right: 0; height: 1px; background: rgba(255,255,255,.075); }
+.p5h-gl.base { bottom: -1px !important; background: rgba(255,255,255,.3); }
+.p5h-gl.one { background: repeating-linear-gradient(90deg, rgba(255,255,255,.34) 0 3px, transparent 3px 6px); }
+.p5h-tk { position: absolute; right: 100%; margin-right: 4px; display: none; transform: translateY(50%); font-size: 10px; line-height: 1; color: rgba(255,255,255,.45); white-space: nowrap; }
+.p5h-tk.z0 { transform: none; }                             /* the 0 sits on the axis, clear of the numbers under it */
+.p5h-g:first-child .p5h-tk { display: block; }
+.p5h-pair { position: relative; min-width: 0; display: flex; flex-direction: column; align-items: center; }
+.p5h-bb { display: flex; gap: var(--pg); height: var(--bh); padding-top: var(--hd); box-sizing: border-box; }
+.p5h-b { position: relative; width: var(--bw); height: 100%; transition: opacity .3s ease; }
+.p5h-b .bar { position: absolute; left: 0; right: 0; bottom: 0; border-radius: 5px; background: linear-gradient(180deg, var(--c), var(--c2));
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.28); transition: height .55s var(--ease); }
+.p5h-b .ci { position: absolute; left: 50%; width: 8px; margin-left: -4px; box-sizing: border-box; border-top: 1.3px solid rgba(255,255,255,.85); border-bottom: 1.3px solid rgba(255,255,255,.85);
+  transition: bottom .55s var(--ease), height .55s var(--ease); }
+.p5h-b .ci::before { content: ""; position: absolute; left: 50%; top: 0; bottom: 0; width: 1.3px; margin-left: -.65px; background: rgba(255,255,255,.85); }
+.p5h-vv { display: flex; gap: var(--pg); margin-top: 4px; }
+.p5h-vv span { width: var(--bw); display: flex; justify-content: center; font-size: 11px; font-weight: 650; line-height: 1.2; white-space: nowrap; transition: opacity .3s ease; }
+.p5h-vv [data-m="js"] { color: #a9c6de; } .p5h-vv [data-m="ours"] { color: #ecc865; }
+.p5h-vv i, .p5h-vv b { font: inherit; }
+.p5h-sl { width: 0; display: flex; justify-content: center; margin-top: 2px; font-size: 11px; font-weight: 550; line-height: 1.2; color: rgba(255,255,255,.55); white-space: nowrap; }
+                                                         /* (no width of its own: a pair is as wide as its bars, its name centred under them) */
+.p5h-sl .l { display: none; } .p5h-sl .s { display: inline; }
+.p5h[data-focus="js"] [data-m="ours"], .p5h[data-focus="ours"] [data-m="js"] { opacity: .16; }
+.p5h-legend button[data-m] { opacity: 1 !important; }
+
+/* SPIDER: the Δ cost ribbon under the hands, each saving under its own bars (DexMachina's gains reuse it on phones) */
+.p5h-rib { position: relative; display: grid; grid-template-columns: repeat(var(--n), minmax(0, 1fr)); gap: var(--gap); margin-top: 6px; padding: 4px 0 5px; border-radius: 999px;
+  background: rgba(255,255,255,.065); box-shadow: inset 0 1px 0 rgba(255,255,255,.1), inset 0 0 0 1px rgba(255,255,255,.05); }
+.p5h-rib > span { padding-left: calc(var(--cw) + 15px); text-align: center; font-size: 12.5px; font-weight: 700; line-height: 1.25; white-space: nowrap; }
+.p5h-rib > span:first-of-type { padding-left: calc(var(--cw) + 15px + var(--g1)); }
+.p5h-rib b { margin-right: 3px; font-weight: 700; }
+.p5h-rib em { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); font-style: normal; font-size: 11px; font-weight: 600; color: rgba(255,255,255,.6); white-space: nowrap; }
+.p5h-gain { display: none; }                            /* (DexMachina's ribbon: phones only) */
+.p5h-sp { --cw: 62px; --th: 74px; --bh: 80px; --bw: 28px; --pg: 8px; }
+.p5h-sp .p5h-vv span { font-size: 10.5px; }
+
+.p5h-cap { margin: 8px 0 0; font-size: 11.5px; line-height: 1.45; color: rgba(255,255,255,.52); text-wrap: pretty; }
+
+/* the widest panels: the setups' full names */
+@media (min-width: 1240px) { .p5h-sl .l { display: inline; } .p5h-sl .s { display: none; } }
+@media (max-width: 1199px) {
+  .p5h-sp .p5h-axis .l { display: none; } .p5h-sp .p5h-axis .s { display: inline; }
+  .p5h-dm { --cw: 62px; --th: 74px; }
+  .p5h-sp { --cw: 52px; --th: 62px; --bh: 76px; --bw: 24px; --pg: 6px; }
+  .p5h-sp .p5h-g { padding: 6px 5px 5px; gap: 0 6px; }
+  .p5h-sp .p5h-hn b { font-size: 11.5px; } .p5h-sp .p5h-hn span { font-size: 9.5px; }
+  .p5h-sp .p5h-vv .z { display: none; }                  /* .089, as the ticks */
+  .p5h-sp .p5h-vv span { font-size: 10.5px; }
+  .p5h-rib em { display: none; }
+  .p5h-rib > span { padding-left: calc(var(--cw) + 11px); }
+  .p5h-rib > span:first-of-type { padding-left: calc(var(--cw) + 11px + var(--g1)); }
+}
+/* tablets: short legend and axis (one head row); both panels' hands under their bars (beside them the bars had too little
+   room), name and DoF on one line */
+@media (max-width: 1099px) { .p5h-legend .l, .p5h-key .l { display: none; } .p5h-legend .s, .p5h-key .s { display: inline; } }   /* (one head row with either task) */
+@media (max-width: 999px) {
+  .p5h-axis .l { display: none; } .p5h-axis .s { display: inline; }
+  .p5h-vv .z { display: none; }
+  .p5h-dm { --gap: 4px; --th: 60px; --bh: 76px; --bw: 20px; --pg: 4px; --g1: 16px; }
+  .p5h-dm .p5h-plot { justify-content: center; gap: 18px; }
+  .p5h-dm .p5h-vv span, .p5h-dm .p5h-sl { font-size: 10px; }
+  .p5h-dm .p5h-hn b, .p5h-sp .p5h-hn b { font-size: 11.5px; } .p5h-dm .p5h-hn span, .p5h-sp .p5h-hn span { font-size: 9.5px; }
+  .p5h-sp { --gap: 4px; --th: 58px; --bh: 66px; --bw: 24px; --pg: 6px; --g1: 16px; }
+  .p5h-dm .p5h-g, .p5h-sp .p5h-g { grid-template-columns: minmax(0, 1fr); gap: 0; padding: 6px 4px 5px; }
+  .p5h-dm .p5h-chip, .p5h-sp .p5h-chip { order: 2; margin-top: 3px; }
+  .p5h-dm .p5h-hn, .p5h-sp .p5h-hn { margin-top: 1px; }
+  .p5h-dm .p5h-hn b, .p5h-dm .p5h-hn span, .p5h-sp .p5h-hn b, .p5h-sp .p5h-hn span { display: inline; margin: 0 2px; }
+  .p5h-sp .p5h-vv span { font-size: 10px; }
+  .p5h-rib > span, .p5h-rib > span:first-of-type { padding-left: 0; }
+  .p5h-rib > span:first-of-type { padding-left: var(--g1); }
+}
+/* phones: one title row, one legend row; both panels in one row of hand columns (bars, hand, name and DoF), a ribbon of
+   numbers under them. DexMachina's columns hold two tight pairs (task reward only, then + curriculum) split by a hairline,
+   the setups named once in the key under the legend, its gains in the ribbon under their pairs. Its bars and hands
+   scale with the screen (four columns have room to grow), SPIDER's six stay fixed. */
+@media (max-width: 759px) {
+  .p5h-head { gap: 6px 8px; }
+  .p5h-head h3 { font-size: 13px; flex: 1 1 auto; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .p5h-axis { font-size: 11px; margin-left: auto; }
+  .p5h-legend { margin-left: 0; width: 100%; flex-wrap: nowrap; gap: 4px; }
+  .p5h-legend button { flex: 1; justify-content: center; padding: 3px 4px; min-height: 26px; font-size: 11px; gap: 4px; }
+  .p5h-key { flex: 1; justify-content: center; padding: 3px 2px; min-height: 26px; font-size: 11px; gap: 5px; }
+  .p5h-key i { width: 11px; height: 11px; border-radius: 3.5px; }
+  .p5h .l, .p5h-sl .l { display: none; } .p5h .s, .p5h-sl .s { display: inline; }
+  .p5h-sk { display: flex; width: 100%; justify-content: center; flex-wrap: wrap; gap: 2px 16px; margin-top: -1px;
+    font-size: 10.5px; font-weight: 600; line-height: 1.3; color: rgba(255,255,255,.62); }
+  .p5h-grid { margin-top: 6px; }
+  .p5h-g { border-radius: 11px; }
+  .p5h-hn b, .p5h-dm .p5h-hn b, .p5h-sp .p5h-hn b { font-size: 11px; } .p5h-hn span, .p5h-dm .p5h-hn span, .p5h-sp .p5h-hn span { font-size: 9.5px; }
+  .p5h-tk { font-size: 9px; margin-right: 3px; }
+  .p5h-dm { --gap: 3px; --th: clamp(50px, 14vw, 66px); --bh: 70px; --hd: 6px; --bw: clamp(10px, 3vw, 18px); --pg: 2px; --sg: clamp(7px, 2.2vw, 14px); --g1: 13px; }
+  .p5h-dm .p5h-g, .p5h-sp .p5h-g { padding: 5px 2px 4px; }
+  .p5h-dm .p5h-chip, .p5h-sp .p5h-chip { margin-top: 2px; }
+  .p5h-dm .p5h-hn b, .p5h-dm .p5h-hn span, .p5h-sp .p5h-hn b, .p5h-sp .p5h-hn span { display: block; margin: 0; }
+  .p5h-dm .p5h-plot { justify-content: center; gap: var(--sg); }
+  .p5h-dm .p5h-pair + .p5h-pair::before { content: ""; position: absolute; left: calc(var(--sg) / -2 - .5px); top: var(--hd); width: 1px; height: calc(var(--bh) - var(--hd));
+    background: rgba(255,255,255,.16); pointer-events: none; }
+  .p5h-dm .p5h-vv, .p5h-dm .p5h-sl { display: none; }   /* the ribbon carries the numbers, the key the setups */
+  .p5h-dm .p5h-gain { display: grid; }
+  .p5h-rc { display: flex; justify-content: center; gap: var(--sg); padding: 0 2px; }
+  .p5h-rc:first-child { padding-left: calc(2px + var(--g1)); }
+  .p5h-rc span { width: calc(2 * var(--bw) + var(--pg)); display: flex; justify-content: center; font-size: 10.5px; font-weight: 700; line-height: 1.25; white-space: nowrap;
+    transition: color .55s var(--ease); }
+  .p5h-sp { --gap: 2px; --th: 50px; --bh: 66px; --hd: 6px; --bw: 15px; --pg: 3px; --g1: 13px; }
+  .p5h-sp .p5h-vv { display: none; }                      /* the narrowest columns: the Δ ribbon carries the numbers */
+  .p5h-rib { margin-top: 4px; padding: 3px 0 4px; }
+  .p5h-rib > span { font-size: 10px; }
+  .p5h-rib > span:first-of-type { padding-left: 0; }
+  .p5h-rib b { margin-right: 1px; }
+  .p5h-cap { font-size: 10.5px; margin-top: 6px; }
+}
+/* small phones: DexMachina's shortest title */
+@media (max-width: 389px) { .p5h .s.p5h-t2 { display: none; } .p5h .p5h-t3 { display: inline; } }
+@media (max-width: 359px) {
+  .p5h-dm, .p5h-sp { --g1: 0px; }                         /* no ticks: the columns need the width */
+  .p5h-g:first-child .p5h-tk { display: none; }
+  .p5h-sk { gap: 2px 12px; font-size: 10px; }
+  .p5h-key { flex: 0 0 auto; padding: 3px 6px 3px 4px; }  /* (the methods' buttons get the room) */
+  .p5h-hn b, .p5h-dm .p5h-hn b, .p5h-sp .p5h-hn b { font-size: 10px; } .p5h-hn span, .p5h-dm .p5h-hn span, .p5h-sp .p5h-hn span { font-size: 9px; }
+  .p5h-rc span { font-size: 10px; }
+  .p5h-rib > span { font-size: 9px; letter-spacing: -.01em; }
+  .p5h-rib b { margin-right: 0; }
+}
