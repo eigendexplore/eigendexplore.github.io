@@ -76,10 +76,24 @@ let rectInit = false;
 export function initAreaLights() { if (!rectInit) { RectAreaLightUniformsLib.init(); rectInit = true; } }
 
 // Imagination PowerVR GPUs (the Pixel 10's) hang on a VSM map read inside the area-light loop (LIGHTS_CHUNK), and Chrome
-// then blocks WebGL for the whole page; PCF soft shadows there work (a little crisper, everything else the same)
+// then blocks WebGL for the whole page; PCF soft shadows there work, kept as soft as VSM's and free of stripes below
 function vsmHangs(r) {
   const gl = r.getContext(), info = gl.getExtension('WEBGL_debug_renderer_info');
   return /PowerVR|Imagination/i.test(gl.getParameter(info ? info.UNMASKED_RENDERER_WEBGL : gl.RENDERER));
+}
+// the PCF fallback filters across about three texels, VSM across its radius: there the map is made coarser in step, so
+// its edge is as soft as everywhere else (the same shader, only a smaller map)
+let pcfFallback = false;
+export function shadowSize(base, radius) {
+  if (!pcfFallback) return base;
+  return Math.min(base, Math.max(64, 2 ** Math.round(Math.log2(base * 2 / Math.max(1, radius)))));   // 2: closest to VSM's look, measured
+}
+// PCF compares depths directly, so a surface can shadow itself in stripes (VSM never does): there the lookup moves off
+// the surface by ~1.5 of the map's texels (their size where the spot aims; far less than the soft edge is wide)
+export function fitShadowBias(spot) {
+  if (!pcfFallback) return;
+  const d = spot.position.distanceTo(spot.target.position), texel = 2 * d * Math.tan(spot.angle) / spot.shadow.mapSize.x;
+  spot.shadow.normalBias = 1.5 * texel;
 }
 
 export function makeRenderer(canvas, { mobile }) {
@@ -88,7 +102,8 @@ export function makeRenderer(canvas, { mobile }) {
   r.outputColorSpace = THREE.SRGBColorSpace;
   r.toneMapping = THREE.CustomToneMapping;
   r.shadowMap.enabled = true;
-  r.shadowMap.type = vsmHangs(r) ? THREE.PCFSoftShadowMap : THREE.VSMShadowMap;
+  if (vsmHangs(r)) pcfFallback = true;
+  r.shadowMap.type = pcfFallback ? THREE.PCFSoftShadowMap : THREE.VSMShadowMap;
   r.shadowMap.autoUpdate = false;                                 // re-rendered only when a pose changes
   r.setClearColor(0x000000, 0);
   r.setScissorTest(true);
@@ -121,9 +136,10 @@ export function addStudioLights(scene, lights, aim, { mobile = false, angle = 0.
     const spot = new THREE.SpotLight(0xffffff, 0, 0, angle, 0, 0);
     spot.position.copy(p); spot.target.position.copy(aim);
     spot.castShadow = true;
-    spot.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024);
+    const n = shadowSize(mobile ? 512 : 1024, radius); spot.shadow.mapSize.set(n, n);
     spot.shadow.camera.near = near; spot.shadow.camera.far = far;
     spot.shadow.radius = radius; spot.shadow.blurSamples = 12; spot.shadow.bias = -0.0002;
+    fitShadowBias(spot);
     scene.add(area, spot, spot.target); spots.push(spot);
   }
   return spots;

@@ -16,7 +16,7 @@ import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
 import { LineSegments2 } from 'three/addons/lines/LineSegments2.js';
 import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js';
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
-import { Z2Y, CAL, agxContrast, lookGrade, lookMaterials, initAreaLights, makeRenderer, studioMat, addStudioLights } from './studio3d.js';
+import { Z2Y, CAL, agxContrast, lookGrade, lookMaterials, initAreaLights, makeRenderer, studioMat, addStudioLights, shadowSize, fitShadowBias } from './studio3d.js';
 import { stageOrbit } from './stageorbit.js';
 
 const A = new URL('../assets/s5/3d/', import.meta.url).href;
@@ -182,7 +182,7 @@ export async function createP5(canvas, cardsEl, { mobile, key = 'eg-orbit-demo-s
       const SPI = { key: 0.7, fill: 0.1, top: 0.7, rim: 0.1 };
       side.spots.forEach((sp, i) => {
         const nm = lights[i].name; sp.castShadow = nm === 'key' || nm === 'top';
-        sp.shadow.mapSize.set(mobile ? 512 : 1024, mobile ? 512 : 1024); sp.shadow.intensity = S.kind === 'dm' ? 0.85 : (SPI[nm] ?? 0.7);
+        const n = shadowSize(mobile ? 512 : 1024, sp.shadow.radius); sp.shadow.mapSize.set(n, n); fitShadowBias(sp); sp.shadow.intensity = S.kind === 'dm' ? 0.85 : (SPI[nm] ?? 0.7);
       });
       if (S.kind === 'dm') {
         // DexMachina: the hands, the object and the support shadow the studio itself: the bowl's own surface is the
