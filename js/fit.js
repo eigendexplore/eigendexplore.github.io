@@ -43,18 +43,10 @@ export function fitHero(root = document) {
       fitRow({ box: authors, rows, prop: '--af', max: 15, min: 10.5, spare: SPARE, onOk: () => authors.classList.add('stack'), onFail: () => {} });
     });
   }
-  // links: one row of six buttons, 13 px down to 12 px; where that cannot fit (phones), the X button keeps only its logo
-  // and the row tries again, 13 px down to 11 px (the old five-button floor); otherwise two even rows of three, labelled
+  // links: one row of five buttons, 14 px down to 11 px; otherwise they wrap
   const links = root.querySelector('.links');
   if (links) {
-    const mode = m => {
-      links.classList.toggle('one-row', m !== 'wrap');
-      links.classList.toggle('bare-x', m === 'bare');
-      links.classList.toggle('wrap3', m === 'wrap');
-    };
-    watch(links, () => {
-      if (fitRow({ box: links, rows: [links], prop: '--lf', max: 13, min: 12, onOk: () => mode('one'), onFail: () => {} })) return;
-      fitRow({ box: links, rows: [links], prop: '--lf', max: 13, min: 11, onOk: () => mode('bare'), onFail: () => mode('wrap') });
-    });
+    watch(links, () => fitRow({ box: links, rows: [links], prop: '--lf', max: 14, min: 11,
+      onOk: () => links.classList.add('one-row'), onFail: () => links.classList.remove('one-row') }));
   }
 }
