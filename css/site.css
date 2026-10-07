@@ -123,7 +123,7 @@ svg { display: block; }
 .authors a:hover { background-size: 100% 1px; }
 .affil { display: inline-block; margin: 12px 0 0; line-height: 0; border-radius: 6px; }
 .affil img { height: 22px; width: auto; display: block; }
-.links { margin: var(--g2) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .55em; font-size: var(--lf, 14px); }
+.links { margin: var(--g2) 0 0; display: flex; flex-wrap: wrap; justify-content: center; gap: .55em; font-size: var(--lf, 13px); }
 .links.one-row { flex-wrap: nowrap; }
 .tldr { margin: var(--g2) auto 0; max-width: 680px; padding: 14px 18px; text-align: left; font-size: 15px; line-height: 1.56; color: var(--ink2); border-radius: 18px; text-wrap: pretty; }
 .tldr b { color: var(--ink); margin-right: 6px; }
@@ -146,6 +146,16 @@ svg { display: block; }
 .btn .ic.arxiv { fill: #b31b1b; }
 .btn .ic.yt { fill: #ff0033; width: 19px; height: 19px; }
 .btn .ic.gh { fill: #1d1d1f; }
+.btn .ic.x { fill: #1d1d1f; }
+.hero .btn .ic.x { width: 1.02em; height: 1.02em; }
+/* where six labelled buttons cannot share one row (phones), the X button keeps only its logo and the row packs a
+   little tighter; where even that cannot fit, two even rows of three (js/fit.js) */
+.links.bare-x { gap: .28em; }
+.links.bare-x .btn { padding-left: .44em; padding-right: .52em; }
+.links.bare-x .xbtn .xl { display: none; }
+.links.bare-x .xbtn { padding-left: .6em; padding-right: .6em; }
+.links.wrap3 { display: grid; grid-template-columns: repeat(3, max-content); justify-content: center; }
+.links.wrap3 .btn { justify-content: center; }
 
 /* sprites: pixel art at an integer number of device pixels (set by js), in the end card's six spots */
 .spr { display: block; justify-self: center; width: calc(var(--w) * var(--s) * 1px); height: calc(var(--h) * var(--s) * 1px);
