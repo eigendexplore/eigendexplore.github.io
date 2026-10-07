@@ -146,6 +146,11 @@ svg { display: block; }
 .btn .ic.arxiv { fill: #b31b1b; }
 .btn .ic.yt { fill: #ff0033; width: 19px; height: 19px; }
 .btn .ic.gh { fill: #1d1d1f; }
+.btn .ic.x { fill: #1d1d1f; }
+.hero .btn .ic.x { width: 1.02em; height: 1.02em; }
+/* where six buttons cannot share one row (phones), two centred rows of three, each button at its own width (js/fit.js) */
+.links.wrap3 { display: grid; grid-template-columns: repeat(3, max-content); justify-content: center; }
+.links.wrap3 .btn { justify-content: center; padding-left: .86em; padding-right: .94em; }
 
 /* sprites: pixel art at an integer number of device pixels (set by js), in the end card's six spots */
 .spr { display: block; justify-self: center; width: calc(var(--w) * var(--s) * 1px); height: calc(var(--h) * var(--s) * 1px);

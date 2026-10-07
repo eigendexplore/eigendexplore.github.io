@@ -43,10 +43,11 @@ export function fitHero(root = document) {
       fitRow({ box: authors, rows, prop: '--af', max: 15, min: 10.5, spare: SPARE, onOk: () => authors.classList.add('stack'), onFail: () => {} });
     });
   }
-  // links: one row of five buttons, 14 px down to 11 px; otherwise they wrap
+  // links: one row of six buttons, 14 px down to 13 px; where that cannot fit (phones), two centred rows of three at 14 px
   const links = root.querySelector('.links');
   if (links) {
-    watch(links, () => fitRow({ box: links, rows: [links], prop: '--lf', max: 14, min: 11,
-      onOk: () => links.classList.add('one-row'), onFail: () => links.classList.remove('one-row') }));
+    watch(links, () => fitRow({ box: links, rows: [links], prop: '--lf', max: 14, min: 13,
+      onOk: () => { links.classList.add('one-row'); links.classList.remove('wrap3'); },
+      onFail: () => { links.classList.remove('one-row'); links.classList.add('wrap3'); } }));
   }
 }
