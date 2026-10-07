@@ -1,12 +1,15 @@
 // BibTeX: the hero's button pops up a light glass card with the entry and a Copy button. The card floats over the page
 // (nothing below moves), grows out of the button, and closes on a tap outside, Esc, or the button again. Phones: the
 // card fits the screen and the entry scrolls sideways inside it.
-// The arXiv number is a placeholder until the paper is on arXiv (then: arXiv's own export, @misc with eprint).
-const ENTRY = `@article{gupta2026eigendexplore,
-  title   = {{EigenDEXplore}: Structured Exploration for Dexterous Manipulation with Human Priors},
-  author  = {Gupta, Harsh and Lum, Tyler Ga Wei and Wang, Changhao and Pan, Chuer and Liu, C. Karen and Bohg, Jeannette and Song, Shuran},
-  journal = {arXiv preprint arXiv:XXXX.XXXXX},
-  year    = {2026}
+// The entry is arXiv's own record (arxiv.org/bibtex/2610.07681), with the short key and the title's capitals kept.
+const ENTRY = `@misc{gupta2026eigendexplore,
+  title         = {{EigenDEXplore}: Structured Exploration for Dexterous Manipulation with Human Priors},
+  author        = {Gupta, Harsh and Lum, Tyler Ga Wei and Wang, Changhao and Pan, Chuer and Liu, C. Karen and Bohg, Jeannette and Song, Shuran},
+  year          = {2026},
+  eprint        = {2610.07681},
+  archivePrefix = {arXiv},
+  primaryClass  = {cs.RO},
+  url           = {https://arxiv.org/abs/2610.07681}
 }`;
 const EASE = 'cubic-bezier(.45, 0, .2, 1)';
 const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
