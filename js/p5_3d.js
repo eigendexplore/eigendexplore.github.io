@@ -18,6 +18,7 @@ import { LineSegmentsGeometry } from 'three/addons/lines/LineSegmentsGeometry.js
 import { LineMaterial } from 'three/addons/lines/LineMaterial.js';
 import { Z2Y, CAL, agxContrast, lookGrade, lookMaterials, initAreaLights, makeRenderer, studioMat, addStudioLights, shadowSize, fitShadowBias } from './studio3d.js';
 import { stageOrbit } from './stageorbit.js';
+import { readColumns } from './gpuread.js';
 
 const A = new URL('../assets/s5/3d/', import.meta.url).href;
 const SIDES = ['js', 'ours'];
@@ -428,14 +429,15 @@ export async function createP5(canvas, cardsEl, { mobile, key = 'eg-orbit-demo-s
   }
   // the studio's gradient at the cards' edges (as section 3): right after a frame, one column of pixels just inside each
   // card's left and right edge, 24 stops top to bottom, the median of the four (a hand crossing one does not count)
-  function sampleEdges(u) {
+  // asynchronous (js/gpuread.js): the frame is drawn and its pixels queued now, they arrive a frame or two later
+  async function sampleEdges(u) {
     if (!shot) return null;
     render(u, true);
     const gl = renderer.getContext(), p = renderer.getPixelRatio(), cr = canvas.getBoundingClientRect(), N = 24, cols = [];
     for (const s of SIDES) { const r = cards[s].getBoundingClientRect(); cols.push([r.left - cr.left + 6, r.top - cr.top, r.height], [r.right - cr.left - 7, r.top - cr.top, r.height]); }
-    const per = cols.map(([cx, cy, ch]) => {
-      const n = Math.max(8, Math.floor(ch * p) - 4), buf = new Uint8Array(n * 4);
-      gl.readPixels(Math.round(cx * p), Math.round((cr.height - cy - ch) * p) + 2, 1, n, gl.RGBA, gl.UNSIGNED_BYTE, buf);
+    const reads = cols.map(([cx, cy, ch]) => [Math.round(cx * p), Math.round((cr.height - cy - ch) * p) + 2, Math.max(8, Math.floor(ch * p) - 4)]);
+    const per = (await readColumns(gl, reads)).map((buf, j) => {
+      const n = reads[j][2];
       return Array.from({ length: N }, (_, i) => { const r = Math.round((1 - i / (N - 1)) * (n - 1)) * 4; return [buf[r], buf[r + 1], buf[r + 2], buf[r + 3]]; });
     });
     // the studio's light at each height: the median of the four columns (section 3's: a hand crossing one does not count),

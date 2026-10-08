@@ -197,18 +197,22 @@ function player(blk) {
   // the page is the studio (as section 3): the gradient the render shows at the card edges, sampled once from the
   // player's default task, painted behind the stage across the page; the bleeds take its top and floor colours. It does
   // not change with the task
-  let painted = false;
-  function paintStudio() {
+  let painted = false, paintGen = 0;
+  async function paintStudio() {
     const layer = blk.querySelector('.h-bg');
     layer.style.setProperty('--stTop', `${Math.round(cards.offsetTop)}px`); layer.style.setProperty('--stH', `${Math.round(cards.offsetHeight)}px`);
     if (painted || st.shot !== K.shots[0] || !R3?.shot || R3.shot !== K.shots[0]) return;
-    const stops = R3.sampleEdges(0); if (!stops) return;
+    // the default frame is drawn and its pixels queued, then the reader's frame is put straight back (the pixels were
+    // copied in GPU order, so the redraw does not change them); a re-layout meanwhile makes this sample stale
+    const gen = ++paintGen, pending = R3.sampleEdges(0);
+    R3.render(st.u, true);
+    const stops = await pending;
+    if (!stops || gen !== paintGen || painted) return;
     painted = true;
     const rgb = c => `rgb(${c[0]}, ${c[1]}, ${c[2]})`, N = stops.length, tg = `linear-gradient(180deg, ${stops.map((c, i) => `${rgb(c)} ${(i / (N - 1) * 100).toFixed(1)}%`).join(', ')})`;
     layer.style.setProperty('--tg', tg); for (const s of SIDES) cardEl[s].style.setProperty('--tg', tg);
     const root = document.documentElement.style, k = kind === 'dm' ? 'dm' : 'sp';
     root.setProperty(`--${k}Top`, rgb(stops[0])); root.setProperty(`--${k}Bot`, rgb(stops[N - 1]));
-    R3.render(st.u, true);
   }
   const relayout = () => { clipKey = ''; maskCanvas(); R3?.invalidate(); if (R3?.shot) requestAnimationFrame(() => { painted = false; paintStudio(); }); };
   const ro = new ResizeObserver(() => { const k = SIDES.map(s => `${cardEl[s].offsetWidth}x${cardEl[s].offsetHeight}`).join('|'); if (k !== rk) { rk = k; relayout(); } });

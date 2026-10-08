@@ -23,6 +23,9 @@ fitS3();
 fitS4();
 fitS5();
 levelResets();
+// smooth wheel scrolling only where there is a mouse or trackpad (phones never load it)
+if (matchMedia('(hover: hover) and (pointer: fine)').matches)
+  import('./smoothscroll.js').then(m => m.initSmoothScroll()).catch(e => console.error('smooth scroll', e));
 const s1 = import('./s1.js');
 s1.then(m => m.init()).catch(e => console.error('section 1', e));
 

@@ -30,6 +30,10 @@
 * { box-sizing: border-box; }
 html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
 @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+/* smooth wheel scrolling (js/smoothscroll.js, Lenis's own stylesheet) */
+html.lenis, html.lenis body { height: auto; }
+.lenis:not(.lenis-autoToggle).lenis-stopped { overflow: clip; }
+.lenis [data-lenis-prevent] { overscroll-behavior: contain; }
 html { background: #fff; }
 body {
   margin: 0; background: var(--studio); color: var(--ink); font-family: var(--font);

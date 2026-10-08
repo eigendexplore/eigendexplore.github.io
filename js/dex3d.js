@@ -243,7 +243,7 @@ export async function createReplay(canvas, cardsEl, { mobile }) {
   });
   const upP = e => { pts.delete(e.pointerId); if (pts.size < 2) pinch0 = null; };
   canvas.addEventListener('pointerup', upP); canvas.addEventListener('pointercancel', upP);
-  canvas.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); orb.tzoom = THREE.MathUtils.clamp(orb.tzoom * Math.exp(e.deltaY * 0.004), 0.45, 2.2); keepClear(); emit(); }, { passive: false });
+  canvas.addEventListener('wheel', e => { if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault(); e.lenisStopPropagation = true; orb.tzoom = THREE.MathUtils.clamp(orb.tzoom * Math.exp(e.deltaY * 0.004), 0.45, 2.2); keepClear(); emit(); }, { passive: false });
   canvas.addEventListener('dblclick', () => reset());
   function keepClear() { const [lo, hi] = pitchRange(); orb.tel = THREE.MathUtils.clamp(orb.tel, Math.max(lo, -0.9), Math.min(hi, 0.9)); }
   function reset() { orb.taz = 0; orb.tel = 0; orb.tzoom = 1; emit(); }

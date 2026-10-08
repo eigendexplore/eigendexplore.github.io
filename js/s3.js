@@ -13,6 +13,7 @@ import { Z2Y, CAL, agxContrast, lookMaterials, loadGlb, loadLights, initAreaLigh
 import { phone, engaged } from './stage.js';
 import { quiet, breathe, yieldTask } from './idle.js';
 import { orbitDemo } from './orbitdemo.js';
+import { readColumns } from './gpuread.js';
 
 const $ = (s, r = document) => r.querySelector(s);
 const S3 = new URL('../assets/s3/', import.meta.url).href;
@@ -304,7 +305,10 @@ export async function init() {
   // ---------------------------------------------------------------- frame
   const cards = SIDES.map(m => stage.querySelector(`.t-card[data-side="${m}"]`));
   let rects = null, W = 0, H = 0, needGrad = true;         // read on resize only (no layout reads in the frame)
-  const root = document.documentElement;
+  // the section's variables are set on the two elements that use them (the section, the bleed below it), not the page
+  // root: a root variable restyles the whole page, a long frame when the sampled gradient lands mid-scroll
+  const varEls = [stage.closest('.s3'), document.querySelector('.bleed.b34')].filter(Boolean);
+  const setVar = (k, v) => varEls.forEach(e => e.style.setProperty(k, v));
   // only a real change of the stage (its size or its place) re-lays the canvas and the band: the paper's figure growing
   // below it resizes the column every frame of its opening, and must cost nothing here
   let geoKey = '';
@@ -312,27 +316,33 @@ export async function init() {
     const w = stage.clientWidth, h = stage.clientHeight, top = stage.offsetTop, bw = band.clientWidth, key = `${w}|${h}|${top}|${bw}`;
     if (key === geoKey) return; geoKey = key;
     W = w; H = h; rects = cards.map(c => [c.offsetLeft, c.offsetTop, c.offsetWidth, c.offsetHeight]); G = null; needGrad = true;
-    root.style.setProperty('--stTop', `${top}px`); root.style.setProperty('--stH', `${h}px`);
+    warmQ.push(() => { if (!G) buildBand(); });          // built ahead in a frame of its own (the first visible frame has enough to do)
+    setVar('--stTop', `${top}px`); setVar('--stH', `${h}px`);
   });
   ro.observe(stage); ro.observe(stage.parentElement);
   // the page is the studio: once a frame shows the default view, one column of pixels at each card edge gives the
   // studio's gradient at every height (the median of the four columns, so the robot or a table leg crossing one does
   // not count); it is drawn behind the cards across the page and continued above and below them (css .s3)
   const gl = renderer.getContext();
+  // the pixels come back a frame or two later (js/gpuread.js), so the frame that asks never waits for the GPU
+  let gradBusy = false;
   function sampleGradient() {
-    const p = renderer.getPixelRatio(), N = 24, cols = [];
+    const p = renderer.getPixelRatio(), N = 24, cols = [], key = geoKey;
     rects.forEach(([x, y, w, h]) => cols.push([x + 4, y, h], [x + w - 5, y, h]));
-    const per = cols.map(([cx, cy, ch]) => {
-      const n = Math.max(8, Math.floor(ch * p) - 4), buf = new Uint8Array(n * 4);
-      gl.readPixels(Math.round(cx * p), Math.round((H - cy - ch) * p) + 2, 1, n, gl.RGBA, gl.UNSIGNED_BYTE, buf);     // bottom row first
-      return Array.from({ length: N }, (_, i) => { const r = Math.round((1 - i / (N - 1)) * (n - 1)) * 4; return [buf[r], buf[r + 1], buf[r + 2]]; });
+    const reads = cols.map(([cx, cy, ch]) => [Math.round(cx * p), Math.round((H - cy - ch) * p) + 2, Math.max(8, Math.floor(ch * p) - 4)]);
+    gradBusy = true;
+    readColumns(gl, reads).then(bufs => {
+      gradBusy = false;
+      if (key !== geoKey) return;                                              // re-laid meanwhile: sampled again
+      const per = bufs.map((buf, j) => { const n = reads[j][2];               // bottom row first
+        return Array.from({ length: N }, (_, i) => { const r = Math.round((1 - i / (N - 1)) * (n - 1)) * 4; return [buf[r], buf[r + 1], buf[r + 2]]; }); });
+      const stops = Array.from({ length: N }, (_, i) => per.map(c => c[i]).sort((a, b) => a[0] + a[1] + a[2] - b[0] - b[1] - b[2])[Math.floor(cols.length / 2)]);
+      if (stops.some(c => c[0] + c[1] + c[2] < 30)) return;                   // not drawn yet
+      const rgb = c => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
+      setVar('--tg', `linear-gradient(180deg, ${stops.map((c, i) => `${rgb(c)} ${(i / (N - 1) * 100).toFixed(1)}%`).join(', ')})`);
+      setVar('--tgTop', rgb(stops[0])); setVar('--tgBot', rgb(stops[N - 1]));      // also the bleed below
+      needGrad = false;
     });
-    const stops = Array.from({ length: N }, (_, i) => per.map(c => c[i]).sort((a, b) => a[0] + a[1] + a[2] - b[0] - b[1] - b[2])[Math.floor(cols.length / 2)]);
-    if (stops.some(c => c[0] + c[1] + c[2] < 30)) return false;                  // not drawn yet
-    const rgb = c => `rgb(${c[0]}, ${c[1]}, ${c[2]})`;
-    root.style.setProperty('--tg', `linear-gradient(180deg, ${stops.map((c, i) => `${rgb(c)} ${(i / (N - 1) * 100).toFixed(1)}%`).join(', ')})`);
-    root.style.setProperty('--tgTop', rgb(stops[0])); root.style.setProperty('--tgBot', rgb(stops[N - 1]));      // also the bleed into the footer
-    return true;
   }
   let clipKey = '', last = performance.now(), lastTick = 0, first = true, lastDraw = 0;
   function clipCanvas(sr, rects) {
@@ -391,7 +401,7 @@ export async function init() {
       if (dv) { heldMat[m].opacity = 1 - dv.w; renderer.render(heldScene[m], heldCam); }
     });
     renderer.setScissorTest(false);
-    if (needGrad && !orbited() && !demo.active && !st.jump && st.release == null) needGrad = !sampleGradient();
+    if (needGrad && !gradBusy && !orbited() && !demo.active && !st.jump && st.release == null) sampleGradient();
     const fb = fbAt(st.f);
     drawBand(fb, now); placeThumb(fb, dt);
     if (first) { first = false; stage.classList.add('ready'); }

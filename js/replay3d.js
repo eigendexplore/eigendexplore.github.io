@@ -200,7 +200,7 @@ export async function createReplay(canvas, cardsEl, { mobile, fullFrame = false 
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
   canvas.addEventListener('wheel', e => {
     if (!(e.ctrlKey || e.metaKey)) return;                       // plain wheel keeps scrolling the page
-    e.preventDefault();
+    e.preventDefault(); e.lenisStopPropagation = true;            // nor does the smooth scroller (js/smoothscroll.js)
     orb.tzoom = THREE.MathUtils.clamp(orb.tzoom * Math.exp(e.deltaY * 0.004), 0.45, 2.2); keepClear(); emit();
   }, { passive: false });
   canvas.addEventListener('dblclick', () => reset());
